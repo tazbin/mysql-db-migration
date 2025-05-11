@@ -19,7 +19,7 @@
 
 We have two ways to do the migration:
 
-### 1. Automated Script (Recommended)
+### 1. Automated Script
 - A script written in Go can handle the migration automatically.
 - We just provide a config with table and column names.
 - It's automated process.
