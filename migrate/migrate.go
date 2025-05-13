@@ -71,7 +71,7 @@ func UpdateColumnTypes(tableName string, mapping map[string]string) error {
 	return nil
 }
 
-// MigrateData moves data with column mapping and adds `is_migrated = TRUE`. Uses transaction.
+// MigrateData moves data with column mapping and adds `is_migrated = TRUE`.
 func MigrateData(mapping map[string]interface{}) error {
 	sourceTable := mapping["source_table"].(string)
 	targetTable := mapping["target_table"].(string)
@@ -84,19 +84,6 @@ func MigrateData(mapping map[string]interface{}) error {
 		targetCols = append(targetCols, tgtCol)
 	}
 
-	// Start a transaction
-	tx, err := db.DB.Begin()
-	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %v", err)
-	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		} else {
-			err = tx.Commit()
-		}
-	}()
-
 	// 1️⃣ Check if 'is_migrated' column exists
 	checkSQL := `
         SELECT COUNT(*)
@@ -106,7 +93,7 @@ func MigrateData(mapping map[string]interface{}) error {
         AND COLUMN_NAME = 'is_migrated'
     `
 	var count int
-	err = tx.QueryRow(checkSQL, targetTable).Scan(&count)
+	err := db.DB.QueryRow(checkSQL, targetTable).Scan(&count)
 	if err != nil {
 		return fmt.Errorf("failed to check if 'is_migrated' column exists: %v", err)
 	}
@@ -117,7 +104,7 @@ func MigrateData(mapping map[string]interface{}) error {
 			targetTable,
 		)
 		fmt.Println("Adding is_migrated column:", alterSQL)
-		_, err = tx.Exec(alterSQL)
+		_, err = db.DB.Exec(alterSQL)
 		if err != nil {
 			return fmt.Errorf("failed to add 'is_migrated' column: %v", err)
 		}
@@ -137,7 +124,7 @@ func MigrateData(mapping map[string]interface{}) error {
 	)
 
 	fmt.Println("Executing:", insertSQL)
-	res, err := tx.Exec(insertSQL)
+	res, err := db.DB.Exec(insertSQL)
 	if err != nil {
 		return fmt.Errorf("failed to migrate data: %v", err)
 	}

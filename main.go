@@ -90,20 +90,40 @@ func main() {
 			return
 		}
 
-		err := migrate.AddColumnsIfNotExist(targetTable, newColumns)
+		tx, err := db.DB.Begin()
+		if err != nil {
+			log.Fatalf("❌ Failed to start transaction: %v", err)
+			tx.Rollback()
+			return
+		}
+
+		err = migrate.AddColumnsIfNotExist(targetTable, newColumns)
 		if err != nil {
 			log.Fatalf("Failed to add required columns: %v", err)
+			tx.Rollback()
+			return
 		}
 
 		err = migrate.UpdateColumnTypes(targetTable, columnTypeMapping)
 		if err != nil {
 			log.Fatal(err)
+			tx.Rollback()
+			return
 		}
 
 		err = migrate.MigrateData(migrationMapping)
 		if err != nil {
 			log.Fatalf("❌ Migration failed: %v", err)
+			tx.Rollback()
+			return
 		}
+
+		err = tx.Commit()
+		if err != nil {
+			log.Fatalf("❌ Failed to commit transaction: %v", err)
+			return
+		}
+
 		fmt.Println("✅ Migration successful!")
 
 	case "undo-migrate":
@@ -116,10 +136,26 @@ func main() {
 			return
 		}
 
-		err := migrate.UndoMigration(migrationMapping)
+		tx, err := db.DB.Begin()
+		if err != nil {
+			log.Fatalf("❌ Failed to start transaction: %v", err)
+			tx.Rollback()
+			return
+		}
+
+		err = migrate.UndoMigration(migrationMapping)
 		if err != nil {
 			log.Fatalf("❌ Undo migration failed: %v", err)
+			tx.Rollback()
+			return
 		}
+
+		err = tx.Commit()
+		if err != nil {
+			log.Fatalf("❌ Failed to commit transaction: %v", err)
+			return
+		}
+
 		fmt.Println("✅ Undo migration completed successfully!")
 
 	default:
