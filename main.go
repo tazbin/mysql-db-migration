@@ -59,16 +59,18 @@ func main() {
 
 	// Define table and column mappings
 	tableName := "lk_module_uw_needs_2"
-	columnMapping := map[string]string{
+	columnTypeMapping := map[string]string{
 		"need_id":        "BIGINT(20) UNSIGNED",
 		"need_domain_id": "BIGINT(20) UNSIGNED",
 		"need_city":      "VARCHAR(255)",
 		"need_state":     "VARCHAR(255)",
 		"need_postal":    "VARCHAR(255)",
 		"need_country":   "VARCHAR(255)",
+		"need_latitude":  "DECIMAL(14,8)",
+		"need_longitude": "DECIMAL(14,8)",
 	}
 
-	err := updateColumnTypes(tableName, columnMapping)
+	err := updateColumnTypes(tableName, columnTypeMapping)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,9 +78,9 @@ func main() {
 	mapping := map[string]interface{}{
 		"source_table": "events",
 		"target_table": "lk_module_uw_needs_2",
-		"primary_key":  "need_id",
 		"columns": map[string]string{
-			// "id":          "need_id",
+			// sourvce      target
+			"id":          "event_id",
 			"site_id":     "need_domain_id",
 			"address":     "need_address",
 			"city":        "need_city",
@@ -87,14 +89,25 @@ func main() {
 			"country":     "need_country",
 			"name":        "need_title",
 			"description": "need_body",
+			"private":     "need_public",
+			"lat":         "need_latitude",
+			"lng":         "need_longitude",
+			"created_at":  "need_date_added_utc",
+			"updated_at":  "need_date_updated_utc",
+			"status":      "need_status",
 		},
 	}
-	// 		sourvce      target
 
-	err = migrate.MigrateData(mapping)
+	// err = migrate.MigrateData(mapping)
+	// if err != nil {
+	// 	log.Fatalf("Migration failed: %v", err)
+	// }
+
+	// log.Println("Migration successful!")
+
+	err = migrate.UndoMigration(mapping)
 	if err != nil {
-		log.Fatalf("Migration failed: %v", err)
+		log.Fatalf("Undo migration failed: %v", err)
 	}
 
-	log.Println("Migration successful!")
 }

@@ -3,9 +3,10 @@ package migrate
 import (
 	"db-migration/db"
 	"fmt"
+	"strings"
 )
 
-// MigrateData moves data and adds an `is_migrated` flag.
+// MigrateData moves data with column mapping and adds `is_migrated = TRUE`. Uses transaction.
 func MigrateData(mapping map[string]interface{}) error {
 	sourceTable := mapping["source_table"].(string)
 	targetTable := mapping["target_table"].(string)
@@ -18,6 +19,19 @@ func MigrateData(mapping map[string]interface{}) error {
 		targetCols = append(targetCols, tgtCol)
 	}
 
+	// Start a transaction
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %v", err)
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
 	// 1️⃣ Check if 'is_migrated' column exists
 	checkSQL := `
         SELECT COUNT(*)
@@ -27,7 +41,7 @@ func MigrateData(mapping map[string]interface{}) error {
         AND COLUMN_NAME = 'is_migrated'
     `
 	var count int
-	err := db.DB.QueryRow(checkSQL, targetTable).Scan(&count)
+	err = tx.QueryRow(checkSQL, targetTable).Scan(&count)
 	if err != nil {
 		return fmt.Errorf("failed to check if 'is_migrated' column exists: %v", err)
 	}
@@ -38,7 +52,7 @@ func MigrateData(mapping map[string]interface{}) error {
 			targetTable,
 		)
 		fmt.Println("Adding is_migrated column:", alterSQL)
-		_, err := db.DB.Exec(alterSQL)
+		_, err = tx.Exec(alterSQL)
 		if err != nil {
 			return fmt.Errorf("failed to add 'is_migrated' column: %v", err)
 		}
@@ -47,66 +61,69 @@ func MigrateData(mapping map[string]interface{}) error {
 		fmt.Println("✅ 'is_migrated' column already exists.")
 	}
 
-	// 2️⃣ Handle primary key for auto-incrementing
-	var selectCols string
-	var targetInsertCols []string = append([]string{}, targetCols...) // copy
-
-	primaryKey, hasPrimaryKey := mapping["primary_key"].(string)
-	if hasPrimaryKey && primaryKey != "" {
-		// 🔍 Get max current value of the primary key
-		var maxID int64
-		maxSQL := fmt.Sprintf("SELECT COALESCE(MAX(`%s`), 0) FROM %s", primaryKey, targetTable)
-		err := db.DB.QueryRow(maxSQL).Scan(&maxID)
-		if err != nil {
-			return fmt.Errorf("failed to get max %s: %v", primaryKey, err)
-		}
-		fmt.Printf("✅ Current max %s: %d\n", primaryKey, maxID)
-
-		// 🆙 Initialize @rownum
-		setRownumSQL := fmt.Sprintf("SET @rownum = %d", maxID)
-		fmt.Println("Initializing @rownum:", setRownumSQL)
-		_, err = db.DB.Exec(setRownumSQL)
-		if err != nil {
-			return fmt.Errorf("failed to initialize @rownum: %v", err)
-		}
-
-		// 🛠️ Add primary key at the start of insert columns
-		targetInsertCols = append([]string{primaryKey}, targetInsertCols...)
-		selectCols = fmt.Sprintf("(@rownum := @rownum + 1), %s, TRUE", joinCols(sourceCols))
-	} else {
-		selectCols = fmt.Sprintf("%s, TRUE", joinCols(sourceCols))
-	}
-
-	// 3️⃣ Build and run the final insert
+	// 2️⃣ Build insert query with is_migrated = TRUE
+	selectCols := fmt.Sprintf("%s, TRUE", joinCols(sourceCols))
 	insertSQL := fmt.Sprintf(
 		"INSERT INTO %s (%s, is_migrated) SELECT %s FROM %s",
 		targetTable,
-		joinCols(targetInsertCols),
+		joinCols(targetCols),
 		selectCols,
 		sourceTable,
 	)
 
 	fmt.Println("Executing:", insertSQL)
-	_, err = db.DB.Exec(insertSQL)
+	res, err := tx.Exec(insertSQL)
 	if err != nil {
 		return fmt.Errorf("failed to migrate data: %v", err)
 	}
 
-	fmt.Println("✅ Data migration completed successfully.")
+	// ✅ Log how many rows were inserted
+	rows, _ := res.RowsAffected()
+	fmt.Printf("✅ Data migration completed successfully. Migrated %d rows.\n", rows)
+
 	return nil
 }
 
+// joinCols wraps each column in backticks and joins them with commas
 func joinCols(cols []string) string {
-	return "`" + join(cols, "`, `") + "`"
+	for i := range cols {
+		cols[i] = "`" + cols[i] + "`"
+	}
+	return strings.Join(cols, ", ")
 }
 
-func join(a []string, sep string) string {
-	out := ""
-	for i, v := range a {
-		if i > 0 {
-			out += sep
-		}
-		out += v
+// UndoMigration removes rows with `is_migrated = TRUE` from the target table.
+func UndoMigration(mapping map[string]interface{}) error {
+	targetTable := mapping["target_table"].(string)
+
+	// Start a transaction
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
-	return out
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	// 1️⃣ Delete rows with is_migrated = TRUE
+	deleteSQL := fmt.Sprintf(
+		"DELETE FROM %s WHERE is_migrated = TRUE",
+		targetTable,
+	)
+
+	fmt.Println("Executing:", deleteSQL)
+	res, err := tx.Exec(deleteSQL)
+	if err != nil {
+		return fmt.Errorf("failed to delete migrated rows: %v", err)
+	}
+
+	// ✅ Log how many rows were deleted
+	rows, _ := res.RowsAffected()
+	fmt.Printf("✅ Undo migration completed. Deleted %d rows.\n", rows)
+
+	return nil
 }
