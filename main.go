@@ -5,6 +5,7 @@ import (
 	"db-migration/migrate"
 	"fmt"
 	"log"
+	"os"
 )
 
 func updateColumnTypes(tableName string, mapping map[string]string) error {
@@ -41,6 +42,13 @@ func updateColumnTypes(tableName string, mapping map[string]string) error {
 
 func main() {
 
+	if len(os.Args) < 2 {
+		fmt.Println("❗ Please provide a command: \n   → do-migrate \n   → undo-migrate")
+		return
+	}
+
+	command := os.Args[1]
+
 	// Config setup
 	cfg := db.Config{
 		SSHUser:    "ec2-user",
@@ -70,12 +78,8 @@ func main() {
 		"need_longitude": "DECIMAL(14,8)",
 	}
 
-	err := updateColumnTypes(tableName, columnTypeMapping)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	mapping := map[string]interface{}{
+	// Define migration column mapping
+	migrationMapping := map[string]interface{}{
 		"source_table": "events",
 		"target_table": "lk_module_uw_needs_2",
 		"columns": map[string]string{
@@ -98,16 +102,50 @@ func main() {
 		},
 	}
 
-	// err = migrate.MigrateData(mapping)
-	// if err != nil {
-	// 	log.Fatalf("Migration failed: %v", err)
-	// }
+	sourceTable := migrationMapping["source_table"].(string)
+	targetTable := migrationMapping["target_table"].(string)
 
-	// log.Println("Migration successful!")
+	switch command {
+	case "do-migrate":
+		fmt.Printf("⚠️  You are about to migrate data:\n   → FROM: %s\n   → TO:   %s\n", sourceTable, targetTable)
+		fmt.Print("Proceed with migration? (y/N): ")
+		var input string
+		fmt.Scanln(&input)
+		if input != "y" && input != "Y" {
+			fmt.Println("❌ Migration cancelled.")
+			return
+		}
 
-	err = migrate.UndoMigration(mapping)
-	if err != nil {
-		log.Fatalf("Undo migration failed: %v", err)
+		err := updateColumnTypes(tableName, columnTypeMapping)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = migrate.MigrateData(migrationMapping)
+		if err != nil {
+			log.Fatalf("❌ Migration failed: %v", err)
+		}
+		fmt.Println("✅ Migration successful!")
+
+	case "undo-migrate":
+		fmt.Printf("⚠️  You are about to DELETE migrated data \n   → DELETE FROM: %s\n   → Condition: is_migrated = TRUE\n", targetTable)
+		fmt.Print("Proceed with undo migration? (y/N): ")
+		var input string
+		fmt.Scanln(&input)
+		if input != "y" && input != "Y" {
+			fmt.Println("❌ Undo migration cancelled.")
+			return
+		}
+
+		err := migrate.UndoMigration(migrationMapping)
+		if err != nil {
+			log.Fatalf("❌ Undo migration failed: %v", err)
+		}
+		fmt.Println("✅ Undo migration completed successfully!")
+
+	default:
+		fmt.Printf("❗ Unknown command: %s\n", command)
+		fmt.Println("Available commands: do-migrate, undo-migrate")
 	}
 
 }
