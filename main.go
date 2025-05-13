@@ -8,38 +8,6 @@ import (
 	"os"
 )
 
-func updateColumnTypes(tableName string, mapping map[string]string) error {
-	for col, newType := range mapping {
-		// Get current type
-		var columnType string
-		query := `
-			SELECT COLUMN_TYPE
-			FROM INFORMATION_SCHEMA.COLUMNS
-			WHERE TABLE_SCHEMA = DATABASE()
-			AND TABLE_NAME = ?
-			AND COLUMN_NAME = ?
-		`
-
-		err := db.DB.QueryRow(query, tableName, col).Scan(&columnType)
-		if err != nil {
-			return fmt.Errorf("failed to get current type for column %s: %v", col, err)
-		}
-
-		fmt.Printf("🔍 Column: %s | Current Type: %s | New Type: %s\n", col, columnType, newType)
-
-		// Alter table
-		alterSQL := fmt.Sprintf("ALTER TABLE %s MODIFY %s %s", tableName, col, newType)
-		fmt.Println("Executing:", alterSQL)
-		_, err = db.DB.Exec(alterSQL)
-		if err != nil {
-			return fmt.Errorf("failed to alter column %s: %v", col, err)
-		}
-
-		fmt.Printf("✅ Column %s updated to %s successfully.\n", col, newType)
-	}
-	return nil
-}
-
 func main() {
 
 	if len(os.Args) < 2 {
@@ -65,8 +33,14 @@ func main() {
 	// Connect to DB
 	db.Connect(cfg)
 
+	newColumns := map[string]string{
+		"event_id":              "BIGINT(20)",
+		"need_date_added_utc":   "DATETIME",
+		"need_date_updated_utc": "DATETIME",
+		"is_migrated":           "BOOLEAN DEFAULT FALSE",
+	}
+
 	// Define table and column mappings
-	tableName := "lk_module_uw_needs_2"
 	columnTypeMapping := map[string]string{
 		"need_id":        "BIGINT(20) UNSIGNED",
 		"need_domain_id": "BIGINT(20) UNSIGNED",
@@ -116,7 +90,12 @@ func main() {
 			return
 		}
 
-		err := updateColumnTypes(tableName, columnTypeMapping)
+		err := migrate.AddColumnsIfNotExist(targetTable, newColumns)
+		if err != nil {
+			log.Fatalf("Failed to add required columns: %v", err)
+		}
+
+		err = migrate.UpdateColumnTypes(targetTable, columnTypeMapping)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -6,6 +6,71 @@ import (
 	"strings"
 )
 
+// AddColumnsIfNotExist checks for and adds missing columns to the table
+func AddColumnsIfNotExist(tableName string, columns map[string]string) error {
+	for colName, colType := range columns {
+		// Check if the column exists
+		var count int
+		query := `
+			SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+			WHERE TABLE_SCHEMA = DATABASE()
+			AND TABLE_NAME = ?
+			AND COLUMN_NAME = ?
+		`
+		err := db.DB.QueryRow(query, tableName, colName).Scan(&count)
+		if err != nil {
+			return fmt.Errorf("failed to check column %s: %v", colName, err)
+		}
+
+		if count == 0 {
+			// Column does not exist, add it
+			alterSQL := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", tableName, colName, colType)
+			fmt.Printf("➕ Adding column: %s %s\n", colName, colType)
+			_, err := db.DB.Exec(alterSQL)
+			if err != nil {
+				return fmt.Errorf("failed to add column %s: %v", colName, err)
+			}
+			fmt.Printf("✅ Column %s added successfully.\n", colName)
+		} else {
+			fmt.Printf("✅ Column %s already exists.\n", colName)
+		}
+	}
+	return nil
+}
+
+// Updates column type
+func UpdateColumnTypes(tableName string, mapping map[string]string) error {
+	for col, newType := range mapping {
+		// Get current type
+		var columnType string
+		query := `
+			SELECT COLUMN_TYPE
+			FROM INFORMATION_SCHEMA.COLUMNS
+			WHERE TABLE_SCHEMA = DATABASE()
+			AND TABLE_NAME = ?
+			AND COLUMN_NAME = ?
+		`
+
+		err := db.DB.QueryRow(query, tableName, col).Scan(&columnType)
+		if err != nil {
+			return fmt.Errorf("failed to get current type for column %s: %v", col, err)
+		}
+
+		fmt.Printf("🔍 Column: %s | Current Type: %s | New Type: %s\n", col, columnType, newType)
+
+		// Alter table
+		alterSQL := fmt.Sprintf("ALTER TABLE %s MODIFY %s %s", tableName, col, newType)
+		fmt.Println("Executing:", alterSQL)
+		_, err = db.DB.Exec(alterSQL)
+		if err != nil {
+			return fmt.Errorf("failed to alter column %s: %v", col, err)
+		}
+
+		fmt.Printf("✅ Column %s updated to %s successfully.\n", col, newType)
+	}
+	return nil
+}
+
 // MigrateData moves data with column mapping and adds `is_migrated = TRUE`. Uses transaction.
 func MigrateData(mapping map[string]interface{}) error {
 	sourceTable := mapping["source_table"].(string)
