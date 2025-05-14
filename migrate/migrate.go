@@ -1,13 +1,13 @@
 package migrate
 
 import (
-	"db-migration/db"
+	"database/sql"
 	"fmt"
 	"strings"
 )
 
 // AddColumnsIfNotExist checks for and adds missing columns to the table
-func AddColumnsIfNotExist(tableName string, columns map[string]string) error {
+func AddColumnsIfNotExist(tx *sql.Tx, tableName string, columns map[string]string) error {
 	for colName, colType := range columns {
 		// Check if the column exists
 		var count int
@@ -17,7 +17,7 @@ func AddColumnsIfNotExist(tableName string, columns map[string]string) error {
 			AND TABLE_NAME = ?
 			AND COLUMN_NAME = ?
 		`
-		err := db.DB.QueryRow(query, tableName, colName).Scan(&count)
+		err := tx.QueryRow(query, tableName, colName).Scan(&count)
 		if err != nil {
 			return fmt.Errorf("failed to check column %s: %v", colName, err)
 		}
@@ -26,7 +26,7 @@ func AddColumnsIfNotExist(tableName string, columns map[string]string) error {
 			// Column does not exist, add it
 			alterSQL := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", tableName, colName, colType)
 			fmt.Printf("➕ Adding column: %s %s\n", colName, colType)
-			_, err := db.DB.Exec(alterSQL)
+			_, err := tx.Exec(alterSQL)
 			if err != nil {
 				return fmt.Errorf("failed to add column %s: %v", colName, err)
 			}
@@ -39,7 +39,7 @@ func AddColumnsIfNotExist(tableName string, columns map[string]string) error {
 }
 
 // Updates column type
-func UpdateColumnTypes(tableName string, mapping map[string]string) error {
+func UpdateColumnTypes(tx *sql.Tx, tableName string, mapping map[string]string) error {
 	for col, newType := range mapping {
 		// Get current type
 		var columnType string
@@ -51,7 +51,7 @@ func UpdateColumnTypes(tableName string, mapping map[string]string) error {
 			AND COLUMN_NAME = ?
 		`
 
-		err := db.DB.QueryRow(query, tableName, col).Scan(&columnType)
+		err := tx.QueryRow(query, tableName, col).Scan(&columnType)
 		if err != nil {
 			return fmt.Errorf("failed to get current type for column %s: %v", col, err)
 		}
@@ -61,7 +61,7 @@ func UpdateColumnTypes(tableName string, mapping map[string]string) error {
 		// Alter table
 		alterSQL := fmt.Sprintf("ALTER TABLE %s MODIFY %s %s", tableName, col, newType)
 		fmt.Println("Executing:", alterSQL)
-		_, err = db.DB.Exec(alterSQL)
+		_, err = tx.Exec(alterSQL)
 		if err != nil {
 			return fmt.Errorf("failed to alter column %s: %v", col, err)
 		}
@@ -72,7 +72,7 @@ func UpdateColumnTypes(tableName string, mapping map[string]string) error {
 }
 
 // MigrateData moves data with column mapping and adds `is_migrated = TRUE`.
-func MigrateData(mapping map[string]interface{}) error {
+func MigrateData(tx *sql.Tx, mapping map[string]interface{}) error {
 	sourceTable := mapping["source_table"].(string)
 	targetTable := mapping["target_table"].(string)
 	columns := mapping["columns"].(map[string]string)
@@ -93,7 +93,7 @@ func MigrateData(mapping map[string]interface{}) error {
         AND COLUMN_NAME = 'is_migrated'
     `
 	var count int
-	err := db.DB.QueryRow(checkSQL, targetTable).Scan(&count)
+	err := tx.QueryRow(checkSQL, targetTable).Scan(&count)
 	if err != nil {
 		return fmt.Errorf("failed to check if 'is_migrated' column exists: %v", err)
 	}
@@ -104,7 +104,7 @@ func MigrateData(mapping map[string]interface{}) error {
 			targetTable,
 		)
 		fmt.Println("Adding is_migrated column:", alterSQL)
-		_, err = db.DB.Exec(alterSQL)
+		_, err = tx.Exec(alterSQL)
 		if err != nil {
 			return fmt.Errorf("failed to add 'is_migrated' column: %v", err)
 		}
@@ -124,7 +124,7 @@ func MigrateData(mapping map[string]interface{}) error {
 	)
 
 	fmt.Println("Executing:", insertSQL)
-	res, err := db.DB.Exec(insertSQL)
+	res, err := tx.Exec(insertSQL)
 	if err != nil {
 		return fmt.Errorf("failed to migrate data: %v", err)
 	}
@@ -145,21 +145,8 @@ func joinCols(cols []string) string {
 }
 
 // UndoMigration removes rows with `is_migrated = TRUE` from the target table.
-func UndoMigration(mapping map[string]interface{}) error {
+func UndoMigration(tx *sql.Tx, mapping map[string]interface{}) error {
 	targetTable := mapping["target_table"].(string)
-
-	// Start a transaction
-	tx, err := db.DB.Begin()
-	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %v", err)
-	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		} else {
-			err = tx.Commit()
-		}
-	}()
 
 	// 1️⃣ Delete rows with is_migrated = TRUE
 	deleteSQL := fmt.Sprintf(
