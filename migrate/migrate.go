@@ -5,10 +5,16 @@ import (
 	"fmt"
 )
 
+type RollbackStep struct {
+	Query       string
+	Description string
+	Table       string
+}
+
 // Helper to check if a column exists in a table
-func columnExists(tx *sql.Tx, tableName, columnName string) (bool, error) {
+func columnExists(db *sql.DB, tableName, columnName string) (bool, error) {
 	var count int
-	err := tx.QueryRow(`
+	err := db.QueryRow(`
 		SELECT COUNT(*)
 		FROM INFORMATION_SCHEMA.COLUMNS
 		WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
@@ -16,7 +22,7 @@ func columnExists(tx *sql.Tx, tableName, columnName string) (bool, error) {
 	return count > 0, err
 }
 
-func CreatePivotTable(tx *sql.Tx, pivot map[string]interface{}) error {
+func CreatePivotTable(db *sql.DB, pivot map[string]interface{}) error {
 	fmt.Print("⏳ Creating pivot table... ")
 
 	tableName := pivot["table_name"].(string)
@@ -33,7 +39,7 @@ func CreatePivotTable(tx *sql.Tx, pivot map[string]interface{}) error {
 
 	query += ");"
 
-	_, err := tx.Exec(query)
+	_, err := db.Exec(query)
 	if err != nil {
 		return fmt.Errorf("create pivot table failed: %w", err)
 	}
@@ -42,55 +48,45 @@ func CreatePivotTable(tx *sql.Tx, pivot map[string]interface{}) error {
 	return nil
 }
 
-func AlterTable(tx *sql.Tx, table string, addCols, updateCols map[string]string) error {
+func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string) error {
 	if len(addCols) > 0 {
-		fmt.Printf("⏳ Adding columns to %s table...\n", table)
+		fmt.Printf("⏳ Adding new columns to table **%s**:\n", table)
+		for col, typ := range addCols {
+			fmt.Printf("   ➕ %s %s\n", col, typ)
+		}
 	}
 	for col, typ := range addCols {
-		exists, err := columnExists(tx, table, col)
+		exists, err := columnExists(db, table, col)
 		if err != nil {
 			return fmt.Errorf("checking column %s existence failed: %w", col, err)
 		}
 		if !exists {
-			_, err := tx.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, col, typ))
+			_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, col, typ))
 			if err != nil {
 				return fmt.Errorf("add column %s failed: %w", col, err)
 			}
 		}
 	}
 	if len(addCols) > 0 {
-		fmt.Printf("✅  Added columns to %s table...\n", table)
+		fmt.Printf("✅ Successfully added new columns to table **%s**.\n\n", table)
 	}
 
 	if len(updateCols) > 0 {
-		fmt.Printf("⏳ Updating columns to %s table...\n", table)
+		fmt.Printf("⏳ Modifying existing columns in table **%s**:\n", table)
+		for col, typ := range updateCols {
+			fmt.Printf("   ✏️  %s => %s\n", col, typ)
+		}
 	}
 	for col, typ := range updateCols {
-		_, err := tx.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
+		_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
 		if err != nil {
 			return fmt.Errorf("modify column %s failed: %w", col, err)
 		}
 	}
-
 	if len(updateCols) > 0 {
-		fmt.Printf("✅  Updated columns to %s table...\n", table)
-	}
-	return nil
-}
-
-func AddMigrationDoneColumnToTargetTable(tx *sql.Tx, table string) error {
-	exists, err := columnExists(tx, table, "migration_done")
-	if err != nil {
-		return fmt.Errorf("checking 'migration_done' existence failed: %w", err)
-	}
-	if !exists {
-		_, err := tx.Exec(fmt.Sprintf(`ALTER TABLE %s ADD COLUMN migration_done TINYINT DEFAULT 0`, table))
-		if err != nil {
-			return fmt.Errorf("add column 'migration_done' failed: %w", err)
-		}
+		fmt.Printf("✅ Successfully updated columns in table **%s**.\n\n", table)
 	}
 
-	fmt.Println("✅ 'migration_done' added to target table.")
 	return nil
 }
 
@@ -105,6 +101,29 @@ func MigrateData(tx *sql.Tx, insertQuery, updateSourceQuery, insertPivotQuery st
 
 	if _, err := tx.Exec(insertPivotQuery); err != nil {
 		return fmt.Errorf("failed to insert into pivot table: %w", err)
+	}
+
+	return nil
+}
+
+func RollbackMigration(db *sql.DB, steps []RollbackStep) error {
+	for _, step := range steps {
+		if _, err := db.Exec(step.Query); err != nil {
+			fmt.Printf("❌ Rollback step failed: %s %s\n", step.Description, step.Table)
+			fmt.Println("🔎 Error:", err)
+			fmt.Println("\n💥 Rollback was not fully completed.")
+			fmt.Println("📝 Please manually execute the following queries to finish rollback:")
+
+			for _, s := range steps {
+				fmt.Println()
+				fmt.Printf("---- %s %s ----\n", s.Description, s.Table)
+				fmt.Println(s.Query)
+				fmt.Println()
+			}
+
+			return fmt.Errorf("rollback failed at step [%s %s]: %w", step.Description, step.Table, err)
+		}
+		fmt.Printf("%s %s\n", step.Description, step.Table)
 	}
 
 	return nil

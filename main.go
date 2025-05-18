@@ -111,9 +111,35 @@ func main() {
 								WHERE d.is_migrated = 1;
 								`, pivotTable["table_name"].(string), targetTable)
 
+	// rollback queries:
+
+	rollbackSteps := []migrate.RollbackStep{
+		{
+			Query:       fmt.Sprintf(`DELETE FROM %s WHERE is_migrated = 1`, targetTable),
+			Description: "🗑️  Deleted migrated rows from",
+			Table:       targetTable,
+		},
+		{
+			Query:       fmt.Sprintf(`UPDATE %s SET migration_done = 0 WHERE migration_done = 1`, sourceTable),
+			Description: "♻️  Reset migration_done = 0 in",
+			Table:       sourceTable,
+		},
+		{
+			Query:       fmt.Sprintf(`DELETE FROM %s`, pivotTable),
+			Description: "🧹 Deleted rows from",
+			Table:       pivotTable["table_name"].(string),
+		},
+	}
+
 	switch command {
 	case "do-migrate":
-		fmt.Printf("⚠️  You are about to migrate data:\n   → FROM: %s\n   → TO:   %s\n", sourceTable, targetTable)
+		fmt.Printf("⚠️  You are about to migrate data:\n")
+		fmt.Printf("   → FROM: %s\n", sourceTable)
+		fmt.Printf("   → TO:   %s\n", targetTable)
+		if pivotTable["table_name"].(string) != "" {
+			fmt.Printf("   → VIA:  %s\n", pivotTable["table_name"].(string))
+		}
+
 		fmt.Print("Proceed with migration? (y/N): ")
 		var input string
 		fmt.Scanln(&input)
@@ -122,33 +148,29 @@ func main() {
 			return
 		}
 
-		tx, err := db.DB.Begin()
-		if err != nil {
-			log.Fatalf("❌ Failed to start transaction: %v", err)
-		}
+		fmt.Println()
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		fmt.Println("           ⏳ Starting migration...          ")
+		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
-		err = migrate.CreatePivotTable(tx, pivotTable)
+		err := migrate.CreatePivotTable(db.DB, pivotTable)
 		if err != nil {
-			tx.Rollback()
 			log.Fatalf("❌ Pivot table creation failed: %v", err)
 		}
 
-		err = migrate.AlterTable(tx, targetTable, newColumnsForTargetTable, updateColumnsForTargetTable)
+		err = migrate.AlterTable(db.DB, targetTable, newColumnsForTargetTable, updateColumnsForTargetTable)
 		if err != nil {
-			tx.Rollback()
 			log.Fatalf("❌ Alter target table failed: %v", err)
 		}
 
-		err = migrate.AlterTable(tx, sourceTable, newColumnsForSourceTable, map[string]string{})
+		err = migrate.AlterTable(db.DB, sourceTable, newColumnsForSourceTable, map[string]string{})
 		if err != nil {
-			tx.Rollback()
 			log.Fatalf("❌ Alter target table failed: %v", err)
 		}
 
-		err = migrate.AddMigrationDoneColumnToTargetTable(tx, targetTable)
+		tx, err := db.DB.Begin()
 		if err != nil {
-			tx.Rollback()
-			log.Fatalf("❌ Adding migration_done column failed: %v", err)
+			log.Fatalf("❌ Failed to start transaction: %v", err)
 		}
 
 		err = migrate.MigrateData(tx, insertToTargetQuery, updateSourceQuery, insertToPivotQuery)
@@ -157,24 +179,37 @@ func main() {
 			log.Fatalf("❌ Migration failed: %v", err)
 		}
 
-		tx.Rollback()
-		fmt.Println("kaisa laga mera majak")
-
-		// err = tx.Commit()
-		// if err != nil {
-		// 	log.Fatalf("❌ Failed to commit transaction: %v", err)
-		// }
+		err = tx.Commit()
+		if err != nil {
+			log.Fatalf("❌ Failed to commit transaction: %v", err)
+		}
 
 		fmt.Println("✅ Migration successful!")
 
 	case "undo-migrate":
-		fmt.Printf("⚠️  You are about to DELETE migrated data \n   → DELETE FROM: %s\n   → Condition: is_migrated = TRUE\n", targetTable)
+		fmt.Printf("⚠️  You are about to undo the migration involving these queries:\n\n")
+
+		for _, step := range rollbackSteps {
+			fmt.Printf("→ %s %s:\n", step.Description, step.Table)
+			fmt.Printf("   %s\n\n", step.Query)
+		}
+
 		fmt.Print("Proceed with undo migration? (y/N): ")
 		var input string
 		fmt.Scanln(&input)
 		if input != "y" && input != "Y" {
 			fmt.Println("❌ Undo migration cancelled.")
 			return
+		}
+
+		fmt.Println()
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		fmt.Println("           ⚠️  Starting rollback...          ")
+		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
+		err := migrate.RollbackMigration(db.DB, rollbackSteps)
+		if err != nil {
+			fmt.Println("⚠️  Rollback encountered an issue. See above for details.")
 		}
 
 		fmt.Println("✅ Undo migration completed successfully!")
