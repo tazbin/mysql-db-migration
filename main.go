@@ -33,51 +33,45 @@ func main() {
 	// Connect to DB
 	db.Connect(cfg)
 
-	newColumns := map[string]string{
-		"event_id":              "BIGINT(20)",
-		"need_date_added_utc":   "DATETIME",
-		"need_date_updated_utc": "DATETIME",
-		"is_migrated":           "BOOLEAN DEFAULT FALSE",
-	}
+	sourceTable := "sites"
+	targetTable := "lk_domains_2"
 
-	// Define table and column mappings
-	columnTypeMapping := map[string]string{
-		"need_id":        "BIGINT(20) UNSIGNED",
-		"need_domain_id": "BIGINT(20) UNSIGNED",
-		"need_city":      "VARCHAR(255)",
-		"need_state":     "VARCHAR(255)",
-		"need_postal":    "VARCHAR(255)",
-		"need_country":   "VARCHAR(255)",
-		"need_latitude":  "DECIMAL(14,8)",
-		"need_longitude": "DECIMAL(14,8)",
-	}
-
-	// Define migration column mapping
-	migrationMapping := map[string]interface{}{
-		"source_table": "events",
-		"target_table": "lk_module_uw_needs_2",
-		"columns": map[string]string{
-			// sourvce      target
-			"id":          "event_id",
-			"site_id":     "need_domain_id",
-			"address":     "need_address",
-			"city":        "need_city",
-			"state":       "need_state",
-			"postal_code": "need_postal",
-			"country":     "need_country",
-			"name":        "need_title",
-			"description": "need_body",
-			"private":     "need_public",
-			"lat":         "need_latitude",
-			"lng":         "need_longitude",
-			"created_at":  "need_date_added_utc",
-			"updated_at":  "need_date_updated_utc",
-			"status":      "need_status",
+	pivotTable := map[string]interface{}{
+		"table_name": "mapping_lk_domains_sites",
+		"column_and_types": map[string]string{
+			// id
+			"domain_id": "INT UNSIGNED",    // target table id
+			"site_id":   "BIGINT UNSIGNED", // source table id
+			// created_at
+			// updated_at
 		},
 	}
 
-	sourceTable := migrationMapping["source_table"].(string)
-	targetTable := migrationMapping["target_table"].(string)
+	newColumnsForTargetTable := map[string]string{
+		"is_migrated": "TINYINT(1) DEFAULT 0",
+		"sites_id":    "BIGINT UNSIGNED",
+	}
+
+	updateColumnsForTargetTable := map[string]string{
+		"domain_postal": "VARCHAR(255)",
+	}
+
+	migrationColumnMapping := map[string]string{
+		// target              source
+		"sites_id":            "id",
+		"domain_status":       "status",
+		"domain_name":         "domain",
+		"domain_cname":        "domain",
+		"domain_alias":        "domain",
+		"domain_sitename":     "name",
+		"domain_date_added":   "created_at",
+		"domain_date_updated": "updated_at",
+		"domain_billing_type": "internal",
+		"domain_live":         "live",
+		"domain_postal":       "postal_code",
+		"lat":                 "lat",
+		"lng":                 "lng",
+	}
 
 	switch command {
 	case "do-migrate":
@@ -95,19 +89,25 @@ func main() {
 			log.Fatalf("❌ Failed to start transaction: %v", err)
 		}
 
-		err = migrate.AddColumnsIfNotExist(tx, targetTable, newColumns)
+		err = migrate.CreatePivotTable(tx, pivotTable)
 		if err != nil {
 			tx.Rollback()
-			log.Fatalf("Failed to add required columns: %v", err)
+			log.Fatalf("❌ Pivot table creation failed: %v", err)
 		}
 
-		err = migrate.UpdateColumnTypes(tx, targetTable, columnTypeMapping)
+		err = migrate.AlterTargetTable(tx, targetTable, newColumnsForTargetTable, updateColumnsForTargetTable)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal(err)
+			log.Fatalf("❌ Alter target table failed: %v", err)
 		}
 
-		err = migrate.MigrateData(tx, migrationMapping)
+		err = migrate.AddMigrationDoneColumnToTargetTable(tx, targetTable)
+		if err != nil {
+			tx.Rollback()
+			log.Fatalf("❌ Adding migration_done column failed: %v", err)
+		}
+
+		err = migrate.MigrateData(tx, sourceTable, targetTable, "mapping_lk_domains_sites", migrationColumnMapping)
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration failed: %v", err)
@@ -128,22 +128,6 @@ func main() {
 		if input != "y" && input != "Y" {
 			fmt.Println("❌ Undo migration cancelled.")
 			return
-		}
-
-		tx, err := db.DB.Begin()
-		if err != nil {
-			log.Fatalf("❌ Failed to start transaction: %v", err)
-		}
-
-		err = migrate.UndoMigration(tx, migrationMapping)
-		if err != nil {
-			tx.Rollback()
-			log.Fatalf("❌ Undo migration failed: %v", err)
-		}
-
-		err = tx.Commit()
-		if err != nil {
-			log.Fatalf("❌ Failed to commit transaction: %v", err)
 		}
 
 		fmt.Println("✅ Undo migration completed successfully!")

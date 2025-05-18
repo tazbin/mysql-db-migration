@@ -6,163 +6,125 @@ import (
 	"strings"
 )
 
-// AddColumnsIfNotExist checks for and adds missing columns to the table
-func AddColumnsIfNotExist(tx *sql.Tx, tableName string, columns map[string]string) error {
-	for colName, colType := range columns {
-		// Check if the column exists
-		var count int
-		query := `
-			SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
-			WHERE TABLE_SCHEMA = DATABASE()
-			AND TABLE_NAME = ?
-			AND COLUMN_NAME = ?
-		`
-		err := tx.QueryRow(query, tableName, colName).Scan(&count)
-		if err != nil {
-			return fmt.Errorf("failed to check column %s: %v", colName, err)
-		}
-
-		if count == 0 {
-			// Column does not exist, add it
-			alterSQL := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", tableName, colName, colType)
-			fmt.Printf("➕ Adding column: %s %s\n", colName, colType)
-			_, err := tx.Exec(alterSQL)
-			if err != nil {
-				return fmt.Errorf("failed to add column %s: %v", colName, err)
-			}
-			fmt.Printf("✅ Column %s added successfully.\n", colName)
-		} else {
-			fmt.Printf("✅ Column %s already exists.\n", colName)
-		}
-	}
-	return nil
-}
-
-// Updates column type
-func UpdateColumnTypes(tx *sql.Tx, tableName string, mapping map[string]string) error {
-	for col, newType := range mapping {
-		// Get current type
-		var columnType string
-		query := `
-			SELECT COLUMN_TYPE
-			FROM INFORMATION_SCHEMA.COLUMNS
-			WHERE TABLE_SCHEMA = DATABASE()
-			AND TABLE_NAME = ?
-			AND COLUMN_NAME = ?
-		`
-
-		err := tx.QueryRow(query, tableName, col).Scan(&columnType)
-		if err != nil {
-			return fmt.Errorf("failed to get current type for column %s: %v", col, err)
-		}
-
-		fmt.Printf("🔍 Column: %s | Current Type: %s | New Type: %s\n", col, columnType, newType)
-
-		// Alter table
-		alterSQL := fmt.Sprintf("ALTER TABLE %s MODIFY %s %s", tableName, col, newType)
-		fmt.Println("Executing:", alterSQL)
-		_, err = tx.Exec(alterSQL)
-		if err != nil {
-			return fmt.Errorf("failed to alter column %s: %v", col, err)
-		}
-
-		fmt.Printf("✅ Column %s updated to %s successfully.\n", col, newType)
-	}
-	return nil
-}
-
-// MigrateData moves data with column mapping and adds `is_migrated = TRUE`.
-func MigrateData(tx *sql.Tx, mapping map[string]interface{}) error {
-	sourceTable := mapping["source_table"].(string)
-	targetTable := mapping["target_table"].(string)
-	columns := mapping["columns"].(map[string]string)
-
-	var sourceCols []string
-	var targetCols []string
-	for srcCol, tgtCol := range columns {
-		sourceCols = append(sourceCols, srcCol)
-		targetCols = append(targetCols, tgtCol)
-	}
-
-	// 1️⃣ Check if 'is_migrated' column exists
-	checkSQL := `
-        SELECT COUNT(*)
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE()
-        AND TABLE_NAME = ?
-        AND COLUMN_NAME = 'is_migrated'
-    `
+// Helper to check if a column exists in a table
+func columnExists(tx *sql.Tx, tableName, columnName string) (bool, error) {
 	var count int
-	err := tx.QueryRow(checkSQL, targetTable).Scan(&count)
+	err := tx.QueryRow(`
+		SELECT COUNT(*)
+		FROM INFORMATION_SCHEMA.COLUMNS
+		WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
+	`, tableName, columnName).Scan(&count)
+	return count > 0, err
+}
+
+func CreatePivotTable(tx *sql.Tx, pivot map[string]interface{}) error {
+	tableName := pivot["table_name"].(string)
+	columns := pivot["column_and_types"].(map[string]string)
+
+	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id BIGINT AUTO_INCREMENT PRIMARY KEY,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`, tableName)
+
+	for col, typ := range columns {
+		query += fmt.Sprintf(", %s %s", col, typ)
+	}
+
+	query += ");"
+
+	_, err := tx.Exec(query)
 	if err != nil {
-		return fmt.Errorf("failed to check if 'is_migrated' column exists: %v", err)
+		return fmt.Errorf("create pivot table failed: %w", err)
 	}
 
-	if count == 0 {
-		alterSQL := fmt.Sprintf(
-			"ALTER TABLE %s ADD COLUMN is_migrated BOOLEAN NOT NULL DEFAULT FALSE",
-			targetTable,
-		)
-		fmt.Println("Adding is_migrated column:", alterSQL)
-		_, err = tx.Exec(alterSQL)
-		if err != nil {
-			return fmt.Errorf("failed to add 'is_migrated' column: %v", err)
-		}
-		fmt.Println("✅ 'is_migrated' column added successfully.")
-	} else {
-		fmt.Println("✅ 'is_migrated' column already exists.")
-	}
-
-	// 2️⃣ Build insert query with is_migrated = TRUE
-	selectCols := fmt.Sprintf("%s, TRUE", joinCols(sourceCols))
-	insertSQL := fmt.Sprintf(
-		"INSERT INTO %s (%s, is_migrated) SELECT %s FROM %s",
-		targetTable,
-		joinCols(targetCols),
-		selectCols,
-		sourceTable,
-	)
-
-	fmt.Println("Executing:", insertSQL)
-	res, err := tx.Exec(insertSQL)
-	if err != nil {
-		return fmt.Errorf("failed to migrate data: %v", err)
-	}
-
-	// ✅ Log how many rows were inserted
-	rows, _ := res.RowsAffected()
-	fmt.Printf("✅ Data migration completed successfully. Migrated %d rows.\n", rows)
-
+	fmt.Println("✅ pivot table created")
 	return nil
 }
 
-// joinCols wraps each column in backticks and joins them with commas
-func joinCols(cols []string) string {
-	for i := range cols {
-		cols[i] = "`" + cols[i] + "`"
+func AlterTargetTable(tx *sql.Tx, table string, addCols, updateCols map[string]string) error {
+	for col, typ := range addCols {
+		exists, err := columnExists(tx, table, col)
+		if err != nil {
+			return fmt.Errorf("checking column %s existence failed: %w", col, err)
+		}
+		if !exists {
+			_, err := tx.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, col, typ))
+			if err != nil {
+				return fmt.Errorf("add column %s failed: %w", col, err)
+			}
+		}
 	}
-	return strings.Join(cols, ", ")
+
+	for col, typ := range updateCols {
+		_, err := tx.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
+		if err != nil {
+			return fmt.Errorf("modify column %s failed: %w", col, err)
+		}
+	}
+
+	fmt.Println("✅ target table columns altered.")
+	return nil
 }
 
-// UndoMigration removes rows with `is_migrated = TRUE` from the target table.
-func UndoMigration(tx *sql.Tx, mapping map[string]interface{}) error {
-	targetTable := mapping["target_table"].(string)
-
-	// 1️⃣ Delete rows with is_migrated = TRUE
-	deleteSQL := fmt.Sprintf(
-		"DELETE FROM %s WHERE is_migrated = TRUE",
-		targetTable,
-	)
-
-	fmt.Println("Executing:", deleteSQL)
-	res, err := tx.Exec(deleteSQL)
+func AddMigrationDoneColumnToTargetTable(tx *sql.Tx, table string) error {
+	exists, err := columnExists(tx, table, "migration_done")
 	if err != nil {
-		return fmt.Errorf("failed to delete migrated rows: %v", err)
+		return fmt.Errorf("checking 'migration_done' existence failed: %w", err)
+	}
+	if !exists {
+		_, err := tx.Exec(fmt.Sprintf(`ALTER TABLE %s ADD COLUMN migration_done TINYINT DEFAULT 0`, table))
+		if err != nil {
+			return fmt.Errorf("add column 'migration_done' failed: %w", err)
+		}
 	}
 
-	// ✅ Log how many rows were deleted
-	rows, _ := res.RowsAffected()
-	fmt.Printf("✅ Undo migration completed. Deleted %d rows.\n", rows)
+	fmt.Println("✅ 'migration_done' added to target table.")
+	return nil
+}
+
+func MigrateData(tx *sql.Tx, sourceTable, targetTable, pivotTable string, columnMapping map[string]string) error {
+	// 1. Insert into target table
+	var sourceCols, targetCols []string
+	for targetCol, sourceCol := range columnMapping {
+		targetCols = append(targetCols, targetCol)
+		sourceCols = append(sourceCols, sourceCol)
+	}
+	targetCols = append(targetCols, "sites_id", "is_migrated")
+	sourceCols = append(sourceCols, "id", "1") // id -> sites_id, 1 -> is_migrated
+
+	insertQuery := fmt.Sprintf(`
+		INSERT INTO %s (%s)
+		SELECT %s FROM %s
+		WHERE migration_done = 0
+	`, targetTable, strings.Join(targetCols, ", "), strings.Join(sourceCols, ", "), sourceTable)
+
+	if _, err := tx.Exec(insertQuery); err != nil {
+		return fmt.Errorf("failed to insert into target table: %w", err)
+	}
+
+	// 2. Update source table: set migration_done = 1
+	updateSourceQuery := fmt.Sprintf(`
+		UPDATE %s s
+		JOIN %s t ON s.id = t.sites_id
+		SET s.migration_done = 1
+		WHERE s.migration_done = 0
+	`, sourceTable, targetTable)
+
+	if _, err := tx.Exec(updateSourceQuery); err != nil {
+		return fmt.Errorf("failed to update source table: %w", err)
+	}
+
+	// 3. Insert into pivot table
+	insertPivotQuery := fmt.Sprintf(`
+		INSERT INTO %s (domain_id, site_id)
+		SELECT t.id, t.sites_id
+		FROM %s t
+		WHERE t.is_migrated = 1
+	`, pivotTable, targetTable)
+
+	if _, err := tx.Exec(insertPivotQuery); err != nil {
+		return fmt.Errorf("failed to insert into pivot table: %w", err)
+	}
 
 	return nil
 }
