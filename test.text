@@ -1,0 +1,39 @@
+sourceTable := "sites"
+targetTable := "lk_domains_2"
+
+pivotTable := map[string]interface{}{
+	"table_name": "mapping_lk_domains_sites",
+	"column_and_types": map[string]string{
+		// id
+		"domain_id": "INT UNSIGNED",    // target table id
+		"site_id":   "BIGINT UNSIGNED", // source table id
+		// created_at
+		// updated_at
+	},
+}
+
+newColumnsForTargetTable := map[string]string{
+	"is_migrated": "TINYINT(1) DEFAULT 0",
+	"sites_id":    "BIGINT UNSIGNED",
+}
+
+updateColumnsForTargetTable := map[string]string{
+	"domain_postal": "VARCHAR(255)",
+}
+
+migrationColumnMapping := map[string]string{
+	// target              source
+	"sites_id":            "id",
+	"domain_status":       "status",
+	"domain_name":         "domain",
+	"domain_cname":        "domain",
+	"domain_alias":        "domain",
+	"domain_sitename":     "name",
+	"domain_date_added":   "created_at",
+	"domain_date_updated": "updated_at",
+	"domain_billing_type": "internal",
+	"domain_live":         "live",
+	"domain_postal":       "postal_code",
+	"lat":                 "lat",
+	"lng":                 "lng",
+}

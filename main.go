@@ -56,22 +56,60 @@ func main() {
 		"domain_postal": "VARCHAR(255)",
 	}
 
-	migrationColumnMapping := map[string]string{
-		// target              source
-		"sites_id":            "id",
-		"domain_status":       "status",
-		"domain_name":         "domain",
-		"domain_cname":        "domain",
-		"domain_alias":        "domain",
-		"domain_sitename":     "name",
-		"domain_date_added":   "created_at",
-		"domain_date_updated": "updated_at",
-		"domain_billing_type": "internal",
-		"domain_live":         "live",
-		"domain_postal":       "postal_code",
-		"lat":                 "lat",
-		"lng":                 "lng",
+	newColumnsForSourceTable := map[string]string{
+		"migration_done": "TINYINT(1) DEFAULT 0",
 	}
+
+	// Build SQL queries using fmt.Sprintf
+	insertToTargetQuery := fmt.Sprintf(`
+								INSERT INTO %s (
+									sites_id,
+									domain_status,
+									domain_name,
+									domain_cname,
+									domain_alias,
+									domain_sitename,
+									domain_date_added,
+									domain_date_updated,
+									domain_billing_type,
+									domain_live,
+									domain_postal,
+									lat,
+									lng,
+									is_migrated
+								)
+								SELECT
+									id,
+									status,
+									domain,
+									domain,
+									domain,
+									name,
+									created_at,
+									updated_at,
+									internal,
+									live,
+									postal_code,
+									lat,
+									lng,
+									1
+								FROM %s
+								WHERE migration_done = 0;
+								`, targetTable, sourceTable)
+
+	updateSourceQuery := fmt.Sprintf(`
+								UPDATE %s s
+								JOIN %s d ON s.id = d.sites_id
+								SET s.migration_done = 1
+								WHERE s.migration_done = 0;
+								`, sourceTable, targetTable)
+
+	insertToPivotQuery := fmt.Sprintf(`
+								INSERT INTO %s (domain_id, site_id)
+								SELECT d.domain_id, d.sites_id
+								FROM %s d
+								WHERE d.is_migrated = 1;
+								`, pivotTable["table_name"].(string), targetTable)
 
 	switch command {
 	case "do-migrate":
@@ -95,7 +133,13 @@ func main() {
 			log.Fatalf("❌ Pivot table creation failed: %v", err)
 		}
 
-		err = migrate.AlterTargetTable(tx, targetTable, newColumnsForTargetTable, updateColumnsForTargetTable)
+		err = migrate.AlterTable(tx, targetTable, newColumnsForTargetTable, updateColumnsForTargetTable)
+		if err != nil {
+			tx.Rollback()
+			log.Fatalf("❌ Alter target table failed: %v", err)
+		}
+
+		err = migrate.AlterTable(tx, sourceTable, newColumnsForSourceTable, map[string]string{})
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Alter target table failed: %v", err)
@@ -107,16 +151,19 @@ func main() {
 			log.Fatalf("❌ Adding migration_done column failed: %v", err)
 		}
 
-		err = migrate.MigrateData(tx, sourceTable, targetTable, "mapping_lk_domains_sites", migrationColumnMapping)
+		err = migrate.MigrateData(tx, insertToTargetQuery, updateSourceQuery, insertToPivotQuery)
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration failed: %v", err)
 		}
 
-		err = tx.Commit()
-		if err != nil {
-			log.Fatalf("❌ Failed to commit transaction: %v", err)
-		}
+		tx.Rollback()
+		fmt.Println("kaisa laga mera majak")
+
+		// err = tx.Commit()
+		// if err != nil {
+		// 	log.Fatalf("❌ Failed to commit transaction: %v", err)
+		// }
 
 		fmt.Println("✅ Migration successful!")
 

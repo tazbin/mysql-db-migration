@@ -3,7 +3,6 @@ package migrate
 import (
 	"database/sql"
 	"fmt"
-	"strings"
 )
 
 // Helper to check if a column exists in a table
@@ -18,6 +17,8 @@ func columnExists(tx *sql.Tx, tableName, columnName string) (bool, error) {
 }
 
 func CreatePivotTable(tx *sql.Tx, pivot map[string]interface{}) error {
+	fmt.Print("⏳ Creating pivot table... ")
+
 	tableName := pivot["table_name"].(string)
 	columns := pivot["column_and_types"].(map[string]string)
 
@@ -41,7 +42,10 @@ func CreatePivotTable(tx *sql.Tx, pivot map[string]interface{}) error {
 	return nil
 }
 
-func AlterTargetTable(tx *sql.Tx, table string, addCols, updateCols map[string]string) error {
+func AlterTable(tx *sql.Tx, table string, addCols, updateCols map[string]string) error {
+	if len(addCols) > 0 {
+		fmt.Printf("⏳ Adding columns to %s table...\n", table)
+	}
 	for col, typ := range addCols {
 		exists, err := columnExists(tx, table, col)
 		if err != nil {
@@ -54,7 +58,13 @@ func AlterTargetTable(tx *sql.Tx, table string, addCols, updateCols map[string]s
 			}
 		}
 	}
+	if len(addCols) > 0 {
+		fmt.Printf("✅  Added columns to %s table...\n", table)
+	}
 
+	if len(updateCols) > 0 {
+		fmt.Printf("⏳ Updating columns to %s table...\n", table)
+	}
 	for col, typ := range updateCols {
 		_, err := tx.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
 		if err != nil {
@@ -62,7 +72,9 @@ func AlterTargetTable(tx *sql.Tx, table string, addCols, updateCols map[string]s
 		}
 	}
 
-	fmt.Println("✅ target table columns altered.")
+	if len(updateCols) > 0 {
+		fmt.Printf("✅  Updated columns to %s table...\n", table)
+	}
 	return nil
 }
 
@@ -82,45 +94,14 @@ func AddMigrationDoneColumnToTargetTable(tx *sql.Tx, table string) error {
 	return nil
 }
 
-func MigrateData(tx *sql.Tx, sourceTable, targetTable, pivotTable string, columnMapping map[string]string) error {
-	// 1. Insert into target table
-	var sourceCols, targetCols []string
-	for targetCol, sourceCol := range columnMapping {
-		targetCols = append(targetCols, targetCol)
-		sourceCols = append(sourceCols, sourceCol)
-	}
-	targetCols = append(targetCols, "sites_id", "is_migrated")
-	sourceCols = append(sourceCols, "id", "1") // id -> sites_id, 1 -> is_migrated
-
-	insertQuery := fmt.Sprintf(`
-		INSERT INTO %s (%s)
-		SELECT %s FROM %s
-		WHERE migration_done = 0
-	`, targetTable, strings.Join(targetCols, ", "), strings.Join(sourceCols, ", "), sourceTable)
-
+func MigrateData(tx *sql.Tx, insertQuery, updateSourceQuery, insertPivotQuery string) error {
 	if _, err := tx.Exec(insertQuery); err != nil {
 		return fmt.Errorf("failed to insert into target table: %w", err)
 	}
 
-	// 2. Update source table: set migration_done = 1
-	updateSourceQuery := fmt.Sprintf(`
-		UPDATE %s s
-		JOIN %s t ON s.id = t.sites_id
-		SET s.migration_done = 1
-		WHERE s.migration_done = 0
-	`, sourceTable, targetTable)
-
 	if _, err := tx.Exec(updateSourceQuery); err != nil {
 		return fmt.Errorf("failed to update source table: %w", err)
 	}
-
-	// 3. Insert into pivot table
-	insertPivotQuery := fmt.Sprintf(`
-		INSERT INTO %s (domain_id, site_id)
-		SELECT t.id, t.sites_id
-		FROM %s t
-		WHERE t.is_migrated = 1
-	`, pivotTable, targetTable)
 
 	if _, err := tx.Exec(insertPivotQuery); err != nil {
 		return fmt.Errorf("failed to insert into pivot table: %w", err)
