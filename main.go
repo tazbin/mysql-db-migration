@@ -97,16 +97,15 @@ func main() {
 
 	updateSourceQuery := fmt.Sprintf(`
 								UPDATE %s s
-								JOIN %s d ON s.id = d.sites_id
-								SET s.migration_done = 1
-								WHERE s.migration_done = 0;
+								JOIN %s t ON s.id = t.sites_id
+								SET s.migration_done = 1;
 								`, sourceTableName, targetTableName)
 
 	insertToPivotQuery := fmt.Sprintf(`
 								INSERT INTO %s (domain_id, site_id)
-								SELECT d.domain_id, d.sites_id
-								FROM %s d
-								WHERE d.is_migrated = 1;
+								SELECT t.domain_id, t.sites_id
+								FROM %s t
+								WHERE t.is_migrated = 1;
 								`, pivotTableName, targetTableName)
 
 	rollbackSteps := []migrate.RollbackStep{

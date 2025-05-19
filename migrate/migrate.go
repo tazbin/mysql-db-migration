@@ -3,6 +3,7 @@ package migrate
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 )
 
 type RollbackStep struct {
@@ -23,25 +24,40 @@ func columnExists(db *sql.DB, tableName, columnName string) (bool, error) {
 }
 
 func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) error {
-	fmt.Print("⏳ Creating pivot table... ")
+	fmt.Printf("⏳ Creating pivot table %s...\n", tableName)
 
 	columnDefinition := ""
+	columnNames := []string{}
 	for col, typ := range columns {
 		columnDefinition += fmt.Sprintf("%s %s,", col, typ)
+		columnNames = append(columnNames, col)
 	}
+
+	uniqueKeyName := "unique_" + ""
+	for i, col := range columnNames {
+		if i > 0 {
+			uniqueKeyName += "_"
+		}
+		uniqueKeyName += col
+	}
+
+	uniqueKey := fmt.Sprintf("UNIQUE KEY %s (%s)", uniqueKeyName, strings.Join(columnNames, ", "))
 
 	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id BIGINT AUTO_INCREMENT PRIMARY KEY,
 		%s
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);`, tableName, columnDefinition)
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		%s
+	);`, tableName, columnDefinition, uniqueKey)
 
 	_, err := db.Exec(query)
 	if err != nil {
 		return fmt.Errorf("create pivot table failed: %w", err)
 	}
 
-	fmt.Println("✅ pivot table created")
+	fmt.Printf("🛡️ ✨ UNIQUE constraint on (%s), key name: %s\n", strings.Join(columnNames, ", "), uniqueKeyName)
+	fmt.Printf("✅ Pivot table **%s** created\n\n", tableName)
 	return nil
 }
 
@@ -88,17 +104,23 @@ func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string)
 }
 
 func MigrateData(tx *sql.Tx, insertQuery, updateSourceQuery, insertPivotQuery string) error {
+	fmt.Println("📝 Inserting into target table...")
 	if _, err := tx.Exec(insertQuery); err != nil {
 		return fmt.Errorf("failed to insert into target table: %w", err)
 	}
+	fmt.Printf("✅ Target table insert done\n\n")
 
+	fmt.Println("✏️  Updating source table...")
 	if _, err := tx.Exec(updateSourceQuery); err != nil {
 		return fmt.Errorf("failed to update source table: %w", err)
 	}
+	fmt.Printf("✅ Source table update done\n\n")
 
+	fmt.Println("🔗 Linking data into pivot table...")
 	if _, err := tx.Exec(insertPivotQuery); err != nil {
 		return fmt.Errorf("failed to insert into pivot table: %w", err)
 	}
+	fmt.Printf("✅ Pivot table insert done\n\n")
 
 	return nil
 }
