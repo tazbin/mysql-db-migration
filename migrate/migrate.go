@@ -22,22 +22,19 @@ func columnExists(db *sql.DB, tableName, columnName string) (bool, error) {
 	return count > 0, err
 }
 
-func CreatePivotTable(db *sql.DB, pivot map[string]interface{}) error {
+func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) error {
 	fmt.Print("⏳ Creating pivot table... ")
 
-	tableName := pivot["table_name"].(string)
-	columns := pivot["column_and_types"].(map[string]string)
+	columnDefinition := ""
+	for col, typ := range columns {
+		columnDefinition += fmt.Sprintf("%s %s,", col, typ)
+	}
 
 	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id BIGINT AUTO_INCREMENT PRIMARY KEY,
+		%s
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`, tableName)
-
-	for col, typ := range columns {
-		query += fmt.Sprintf(", %s %s", col, typ)
-	}
-
-	query += ");"
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);`, tableName, columnDefinition)
 
 	_, err := db.Exec(query)
 	if err != nil {

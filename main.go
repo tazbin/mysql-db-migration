@@ -33,18 +33,16 @@ func main() {
 	// Connect to DB
 	db.Connect(cfg)
 
-	sourceTable := "sites"
-	targetTable := "lk_domains_2"
+	sourceTableName := "sites"
+	targetTableName := "lk_domains_2"
+	pivotTableName := "mapping_lk_domains_sites"
 
-	pivotTable := map[string]interface{}{
-		"table_name": "mapping_lk_domains_sites",
-		"column_and_types": map[string]string{
-			// id
-			"domain_id": "INT UNSIGNED",    // target table id
-			"site_id":   "BIGINT UNSIGNED", // source table id
-			// created_at
-			// updated_at
-		},
+	pivotTableColumns := map[string]string{
+		// id
+		"domain_id": "INT UNSIGNED",    // target table id
+		"site_id":   "BIGINT UNSIGNED", // source table id
+		// created_at
+		// updated_at
 	}
 
 	newColumnsForTargetTable := map[string]string{
@@ -95,49 +93,47 @@ func main() {
 									1
 								FROM %s
 								WHERE migration_done = 0;
-								`, targetTable, sourceTable)
+								`, targetTableName, sourceTableName)
 
 	updateSourceQuery := fmt.Sprintf(`
 								UPDATE %s s
 								JOIN %s d ON s.id = d.sites_id
 								SET s.migration_done = 1
 								WHERE s.migration_done = 0;
-								`, sourceTable, targetTable)
+								`, sourceTableName, targetTableName)
 
 	insertToPivotQuery := fmt.Sprintf(`
 								INSERT INTO %s (domain_id, site_id)
 								SELECT d.domain_id, d.sites_id
 								FROM %s d
 								WHERE d.is_migrated = 1;
-								`, pivotTable["table_name"].(string), targetTable)
-
-	// rollback queries:
+								`, pivotTableName, targetTableName)
 
 	rollbackSteps := []migrate.RollbackStep{
 		{
-			Query:       fmt.Sprintf(`DELETE FROM %s WHERE is_migrated = 1`, targetTable),
+			Query:       fmt.Sprintf(`DELETE FROM %s WHERE is_migrated = 1`, targetTableName),
 			Description: "🗑️  Deleted migrated rows from",
-			Table:       targetTable,
+			Table:       targetTableName,
 		},
 		{
-			Query:       fmt.Sprintf(`UPDATE %s SET migration_done = 0 WHERE migration_done = 1`, sourceTable),
+			Query:       fmt.Sprintf(`UPDATE %s SET migration_done = 0 WHERE migration_done = 1`, sourceTableName),
 			Description: "♻️  Reset migration_done = 0 in",
-			Table:       sourceTable,
+			Table:       sourceTableName,
 		},
 		{
-			Query:       fmt.Sprintf(`DELETE FROM %s`, pivotTable),
+			Query:       fmt.Sprintf(`DELETE FROM %s`, pivotTableName),
 			Description: "🧹 Deleted rows from",
-			Table:       pivotTable["table_name"].(string),
+			Table:       pivotTableName,
 		},
 	}
 
 	switch command {
 	case "do-migrate":
 		fmt.Printf("⚠️  You are about to migrate data:\n")
-		fmt.Printf("   → FROM: %s\n", sourceTable)
-		fmt.Printf("   → TO:   %s\n", targetTable)
-		if pivotTable["table_name"].(string) != "" {
-			fmt.Printf("   → VIA:  %s\n", pivotTable["table_name"].(string))
+		fmt.Printf("   → FROM: %s\n", sourceTableName)
+		fmt.Printf("   → TO:   %s\n", targetTableName)
+		if pivotTableName != "" {
+			fmt.Printf("   → VIA:  %s\n", pivotTableName)
 		}
 
 		fmt.Print("Proceed with migration? (y/N): ")
@@ -153,19 +149,19 @@ func main() {
 		fmt.Println("           ⏳ Starting migration...          ")
 		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
-		err := migrate.CreatePivotTable(db.DB, pivotTable)
+		err := migrate.CreatePivotTable(db.DB, pivotTableName, pivotTableColumns)
 		if err != nil {
 			log.Fatalf("❌ Pivot table creation failed: %v", err)
 		}
 
-		err = migrate.AlterTable(db.DB, targetTable, newColumnsForTargetTable, updateColumnsForTargetTable)
+		err = migrate.AlterTable(db.DB, targetTableName, newColumnsForTargetTable, updateColumnsForTargetTable)
 		if err != nil {
 			log.Fatalf("❌ Alter target table failed: %v", err)
 		}
 
-		err = migrate.AlterTable(db.DB, sourceTable, newColumnsForSourceTable, map[string]string{})
+		err = migrate.AlterTable(db.DB, sourceTableName, newColumnsForSourceTable, map[string]string{})
 		if err != nil {
-			log.Fatalf("❌ Alter target table failed: %v", err)
+			log.Fatalf("❌ Alter source table failed: %v", err)
 		}
 
 		tx, err := db.DB.Begin()
@@ -212,7 +208,7 @@ func main() {
 			fmt.Println("⚠️  Rollback encountered an issue. See above for details.")
 		}
 
-		fmt.Println("✅ Undo migration completed successfully!")
+		fmt.Println("\n✅ Undo migration completed successfully!")
 
 	default:
 		fmt.Printf("❗ Unknown command: %s\n", command)
