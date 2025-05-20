@@ -2,6 +2,7 @@ package main
 
 import (
 	"db-migration/db"
+	"db-migration/logger"
 	"db-migration/migrate"
 	"fmt"
 	"log"
@@ -126,6 +127,18 @@ func main() {
 		},
 	}
 
+	// Setup logging
+	logFile := "migration.log" // or "logs/migration_YYYY-MM-DD.log" for daily rotation
+
+	err := logger.Init(logFile)
+	if err != nil {
+		log.Fatalf("❌ Failed to initialize logger: %v", err)
+	}
+	defer logger.Close()
+
+	// Replace default log output to use our logger
+	log.SetOutput(logger.Logger.Writer())
+
 	switch command {
 	case "do-migrate":
 		fmt.Printf("⚠️  You are about to migrate data:\n")
@@ -178,6 +191,9 @@ func main() {
 		if err != nil {
 			log.Fatalf("❌ Failed to commit transaction: %v", err)
 		}
+
+		log.Println("✅ Migration successful!")
+		log.Printf("   → FROM: %s\n", sourceTableName)
 
 		fmt.Println("✅ Migration successful!")
 

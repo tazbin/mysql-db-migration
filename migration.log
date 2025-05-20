@@ -1,0 +1,1 @@
+2025/05/20 10:00:14 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '9555-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
