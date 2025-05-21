@@ -128,7 +128,7 @@ func main() {
 	}
 
 	// Setup logging
-	logFile := "migration.log" // or "logs/migration_YYYY-MM-DD.log" for daily rotation
+	logFile := "migration.log"
 
 	err := logger.Init(logFile)
 	if err != nil {
@@ -157,9 +157,9 @@ func main() {
 		}
 
 		fmt.Println()
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-		fmt.Println("           ⏳ Starting migration...          ")
-		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+		log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		log.Println("           ⏳ Starting migration...          ")
+		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
 		err := migrate.CreatePivotTable(db.DB, pivotTableName, pivotTableColumns)
 		if err != nil {
@@ -193,9 +193,6 @@ func main() {
 		}
 
 		log.Println("✅ Migration successful!")
-		log.Printf("   → FROM: %s\n", sourceTableName)
-
-		fmt.Println("✅ Migration successful!")
 
 	case "undo-migrate":
 		fmt.Printf("⚠️  You are about to undo the migration involving these queries:\n\n")
