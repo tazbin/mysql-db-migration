@@ -28,12 +28,15 @@ func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) e
 
 	columnDefinition := ""
 	columnNames := []string{}
+	checkConstraints := []string{}
+
 	for col, typ := range columns {
 		columnDefinition += fmt.Sprintf("%s %s,", col, typ)
 		columnNames = append(columnNames, col)
+		checkConstraints = append(checkConstraints, fmt.Sprintf("CHECK (%s > 0)", col))
 	}
 
-	uniqueKeyName := "unique_" + ""
+	uniqueKeyName := "unique_"
 	for i, col := range columnNames {
 		if i > 0 {
 			uniqueKeyName += "_"
@@ -42,14 +45,16 @@ func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) e
 	}
 
 	uniqueKey := fmt.Sprintf("UNIQUE KEY %s (%s)", uniqueKeyName, strings.Join(columnNames, ", "))
+	checks := strings.Join(checkConstraints, ",\n")
 
 	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id BIGINT AUTO_INCREMENT PRIMARY KEY,
 		%s
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		%s,
 		%s
-	);`, tableName, columnDefinition, uniqueKey)
+	);`, tableName, columnDefinition, uniqueKey, checks)
 
 	_, err := db.Exec(query)
 	if err != nil {
@@ -130,7 +135,7 @@ func RollbackMigration(db *sql.DB, steps []RollbackStep) error {
 		if _, err := db.Exec(step.Query); err != nil {
 			fmt.Printf("❌ Rollback step failed: %s %s\n", step.Description, step.Table)
 			fmt.Println("🔎 Error:", err)
-			fmt.Println("\n💥 Rollback was not fully completed.")
+			fmt.Println("\n🚨 ⚠️  ❌ Rollback was not fully completed.")
 			fmt.Println("📝 Please manually execute the following queries to finish rollback:")
 
 			for _, s := range steps {

@@ -40,8 +40,8 @@ func main() {
 
 	pivotTableColumns := map[string]string{
 		// id
-		"domain_id": "INT UNSIGNED",    // target table id
-		"site_id":   "BIGINT UNSIGNED", // source table id
+		"domain_id": "INT UNSIGNED NOT NULL",    // target table id
+		"site_id":   "BIGINT UNSIGNED NOT NULL", // source table id
 		// created_at
 		// updated_at
 	}

@@ -1,1 +1,65 @@
 2025/05/20 10:00:14 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '9555-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/20 23:49:56 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '11602-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/20 23:51:19 ✅ Migration successful!
+2025/05/20 23:51:19    → FROM: sites
+2025/05/21 00:02:27 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '13649-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 07:26:30 ✅ Migration successful!
+2025/05/21 07:26:30    → FROM: sites
+2025/05/21 07:48:31 CREATE TABLE IF NOT EXISTS mapping_lk_domains_sites (
+		id BIGINT AUTO_INCREMENT PRIMARY KEY,
+		domain_id INT UNSIGNED NOT NULL,site_id BIGINT UNSIGNED NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		UNIQUE KEY unique_domain_id_site_id (domain_id, site_id),
+		CHECK (domain_id > 0),
+CHECK (site_id > 0)
+	);
+2025/05/21 07:48:39 ✅ Migration successful!
+2025/05/21 07:48:39    → FROM: sites
+2025/05/21 08:18:37 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5461-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 08:20:13 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5461-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 08:20:56 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5461-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 09:05:13 ❌ Alter target table failed: add column in_migration failed: Error 1146 (42S02): Table 'galaxy_g2.lk_domains_2' doesn't exist
+2025/05/21 09:05:48 ❌ Migration failed: failed to insert into target table: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')
+								SELECT
+									id,
+									status,
+									domain,
+									domain,' at line 17
+2025/05/21 09:06:20 ❌ Migration failed: failed to reset target table in_migration flag: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE t.in_migration = 1
+								SET s.in_migration = 0' at line 3
+2025/05/21 09:10:09 ❌ Migration failed: failed to reset target table in_migration flag: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE t.in_migration = 1
+								SET t.in_migration = 0' at line 3
+2025/05/21 09:11:19 
+								UPDATE lk_domains_2 t
+								JOIN mapping_lk_domains_sites p ON t.domain_id = p.domain_id
+								WHERE t.in_migration = 1
+								SET t.in_migration = 0;
+								
+2025/05/21 09:11:20 ❌ Migration failed: failed to reset target table in_migration flag: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE t.in_migration = 1
+								SET t.in_migration = 0' at line 3
+2025/05/21 09:12:48 
+								UPDATE lk_domains_2 t
+								JOIN mapping_lk_domains_sites p ON t.domain_id = p.domain_id
+								SET t.in_migration = 0
+								WHERE t.in_migration = 1;
+								
+2025/05/21 09:12:49 ✅ Migration successful!
+2025/05/21 09:12:49    → FROM: sites
+2025/05/21 09:15:25 ❌ Alter target table failed: add column is_migrated failed: Error 1146 (42S02): Table 'galaxy_g2.lk_domains_2' doesn't exist
+2025/05/21 09:15:52 ✅ Migration successful!
+2025/05/21 09:15:52    → FROM: sites
+2025/05/21 09:17:28 ✅ Migration successful!
+2025/05/21 09:17:28    → FROM: sites
+2025/05/21 09:20:25 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5461-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 09:21:37 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5466-6' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 09:22:59 ✅ Migration successful!
+2025/05/21 09:22:59    → FROM: sites
+2025/05/21 09:24:37 ✅ Migration successful!
+2025/05/21 09:24:37    → FROM: sites
+2025/05/21 09:26:03 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5461-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 09:36:40 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '5461-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/21 09:39:28 ✅ Migration successful!
+2025/05/21 09:39:28    → FROM: sites
+2025/05/21 09:41:37 ✅ Migration successful!
+2025/05/21 09:41:37    → FROM: sites
