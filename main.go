@@ -47,8 +47,10 @@ func main() {
 	}
 
 	newColumnsForTargetTable := map[string]string{
-		"is_migrated": "TINYINT(1) DEFAULT 0",
-		"sites_id":    "BIGINT UNSIGNED",
+		"is_migrated":            "TINYINT(1) DEFAULT 0",
+		"sites_id":               "BIGINT UNSIGNED",
+		"domain_date_added_ts":   "TIMESTAMP",
+		"domain_date_updated_ts": "TIMESTAMP",
 	}
 
 	updateColumnsForTargetTable := map[string]string{
@@ -59,7 +61,6 @@ func main() {
 		"migration_done": "TINYINT(1) DEFAULT 0",
 	}
 
-	// Build SQL queries using fmt.Sprintf
 	insertToTargetQuery := fmt.Sprintf(`
 								INSERT INTO %s (
 									sites_id,
@@ -68,8 +69,8 @@ func main() {
 									domain_cname,
 									domain_alias,
 									domain_sitename,
-									domain_date_added,
-									domain_date_updated,
+									domain_date_added_ts,
+									domain_date_updated_ts,
 									domain_billing_type,
 									domain_live,
 									domain_postal,
@@ -185,6 +186,12 @@ func main() {
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration failed: %v", err)
+		}
+
+		err = migrate.ValidateMigratedData(tx, sourceTableName, targetTableName, pivotTableName)
+		if err != nil {
+			tx.Rollback()
+			log.Fatalf("❌ Migration validation failed: %v", err)
 		}
 
 		err = tx.Commit()
