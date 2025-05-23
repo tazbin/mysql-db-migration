@@ -5,13 +5,13 @@ import (
 	"fmt"
 )
 
-func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable string) error {
+func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable, fieldLevelValidationQuery string) error {
 	err := validateMigrationRowCount(tx, sourceTable, targetTable, pivotTable)
 	if err != nil {
 		return err
 	}
 
-	err = checkFieldLevelEquality(tx, sourceTable, targetTable)
+	err = checkFieldLevelEquality(tx, fieldLevelValidationQuery)
 	if err != nil {
 		return err
 	}
@@ -70,29 +70,8 @@ func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable 
 	return nil
 }
 
-func checkFieldLevelEquality(tx *sql.Tx, sourceTable, targetTable string) error {
-	query := fmt.Sprintf(`
-		SELECT s.id
-		FROM %s s
-		JOIN %s t ON s.id = t.sites_id
-		WHERE s.migration_done = 1 AND t.is_migrated = 1 AND (
-			-- NOT (s.status <=> t.domain_status) OR -- enum
-			NOT (s.domain <=> t.domain_name) OR
-			NOT (s.domain <=> t.domain_cname) OR
-			NOT (s.domain <=> t.domain_alias) OR
-			NOT (s.name <=> t.domain_sitename) OR
-			NOT (DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			NOT (DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			-- NOT (s.internal <=> t.domain_billing_type) OR -- enum
-			NOT (s.live <=> t.domain_live) OR
-			NOT (s.postal_code <=> t.domain_postal) OR
-			NOT (ROUND(s.lat, 5) <=> ROUND(t.lat, 5)) OR
-			NOT (ROUND(s.lng, 5) <=> ROUND(t.lng, 5))
-		)
-		LIMIT 3;
-	`, sourceTable, targetTable)
-
-	rows, err := tx.Query(query)
+func checkFieldLevelEquality(tx *sql.Tx, fieldLevelValidationQuery string) error {
+	rows, err := tx.Query(fieldLevelValidationQuery)
 	if err != nil {
 		return fmt.Errorf("field-level validation failed: %w", err)
 	}
