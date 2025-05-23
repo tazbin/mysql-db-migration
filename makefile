@@ -1,5 +1,5 @@
-do-migration:
+migration-up:
 	go run main.go do-migrate
 
-undo-migration:
+migration-down:
 	go run main.go undo-migrate

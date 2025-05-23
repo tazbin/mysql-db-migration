@@ -76,14 +76,14 @@ func checkFieldLevelEquality(tx *sql.Tx, sourceTable, targetTable string) error 
 		FROM %s s
 		JOIN %s t ON s.id = t.sites_id
 		WHERE s.migration_done = 1 AND t.is_migrated = 1 AND (
-			NOT (s.status <=> t.domain_status) OR
+			-- NOT (s.status <=> t.domain_status) OR -- enum
 			NOT (s.domain <=> t.domain_name) OR
 			NOT (s.domain <=> t.domain_cname) OR
 			NOT (s.domain <=> t.domain_alias) OR
 			NOT (s.name <=> t.domain_sitename) OR
 			NOT (DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
 			NOT (DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			NOT (s.internal <=> t.domain_billing_type) OR
+			-- NOT (s.internal <=> t.domain_billing_type) OR -- enum
 			NOT (s.live <=> t.domain_live) OR
 			NOT (s.postal_code <=> t.domain_postal) OR
 			NOT (ROUND(s.lat, 5) <=> ROUND(t.lat, 5)) OR
