@@ -102,7 +102,6 @@ func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string)
 	// Execute combined ALTER TABLE statement if needed
 	if len(alterClauses) > 0 {
 		query := fmt.Sprintf("ALTER TABLE %s %s", table, strings.Join(alterClauses, ", "))
-		fmt.Println(query)
 		_, err := db.Exec(query)
 		if err != nil {
 			return fmt.Errorf("executing ALTER TABLE failed: %w", err)

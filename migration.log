@@ -278,3 +278,89 @@ CHECK (site_id > 0)
 2025/05/24 21:17:47            ⏳ Starting migration...          
 2025/05/24 21:17:47 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/24 21:18:05 ✅ Migration successful!
+2025/05/25 00:05:38 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:06:14 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:06:21 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:06:21            ⏳ Starting migration...          
+2025/05/25 00:06:21 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:06:29 ❌ Alter source table failed: executing ALTER TABLE failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'groups ADD COLUMN migration_done TINYINT(1) DEFAULT 0' at line 1
+2025/05/25 00:20:29 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:20:33 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:20:33            ⏳ Starting migration...          
+2025/05/25 00:20:33 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:20:44 ❌ Migration validation failed: mismatch in migrated rows: source has 6, target has 12
+2025/05/25 00:21:30 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:21:44 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:21:49 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:21:49            ⏳ Starting migration...          
+2025/05/25 00:21:49 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:21:57 ❌ Alter source table failed: executing ALTER TABLE failed: Error 1060 (42S21): Duplicate column name 'migration_done'
+2025/05/25 00:23:18 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:23:19 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:23:19            ⏳ Starting migration...          
+2025/05/25 00:23:19 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:23:32 ✅ Migration successful!
+2025/05/25 00:23:44 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:23:46 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:23:46            ⏳ Starting migration...          
+2025/05/25 00:23:46 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:23:53 ❌ Alter source table failed: executing ALTER TABLE failed: Error 1060 (42S21): Duplicate column name 'migration_done'
+2025/05/25 00:27:22 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:27:25 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:27:25            ⏳ Starting migration...          
+2025/05/25 00:27:25 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:27:27 ❌ Alter target table failed: checking column is_migrated existence failed: Error 1054 (42S22): Unknown column '?' in 'where clause'
+2025/05/25 00:28:41 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:28:43 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:28:43            ⏳ Starting migration...          
+2025/05/25 00:28:43 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:28:44 ❌ Alter target table failed: checking column ug_date_updated_ts existence failed: Error 1054 (42S22): Unknown column 'lk_user_groups_2' in 'where clause'
+2025/05/25 00:29:54 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:29:56 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:29:56            ⏳ Starting migration...          
+2025/05/25 00:29:56 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:29:57 ❌ Alter target table failed: checking column group_id existence failed: Error 1054 (42S22): Unknown column 'lk_user_groups_2' in 'where clause'
+2025/05/25 00:32:22 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:32:24 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:32:24            ⏳ Starting migration...          
+2025/05/25 00:32:24 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:32:31 ❌ Alter source table failed: executing ALTER TABLE failed: Error 1060 (42S21): Duplicate column name 'migration_done'
+2025/05/25 00:34:49 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:34:51 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:34:51            ⏳ Starting migration...          
+2025/05/25 00:34:51 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:34:52 ❌ Alter target table failed: checking column group_id existence failed: Error 1054 (42S22): Unknown column 'lk_user_groups_2' in 'where clause'
+2025/05/25 00:36:24 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:37:11 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:38:37 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:38:50 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:38:52 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:38:52            ⏳ Starting migration...          
+2025/05/25 00:38:52 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:39:04 ✅ Migration successful!
+2025/05/25 00:39:40 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:40:01 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:41:10 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:41:35 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:41:37 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:41:37            ⏳ Starting migration...          
+2025/05/25 00:41:37 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:41:50 ❌ Migration validation failed: pivot table validation failed: expected 6 rows, got 12
+2025/05/25 00:42:12 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:42:28 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:42:29 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:42:29            ⏳ Starting migration...          
+2025/05/25 00:42:29 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:42:41 ✅ Migration successful!
+2025/05/25 00:42:54 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:42:56 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:42:56            ⏳ Starting migration...          
+2025/05/25 00:42:56 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:43:02 ❌ Alter source table failed: executing ALTER TABLE failed: Error 1060 (42S21): Duplicate column name 'migration_done'
+2025/05/25 00:43:30 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:43:42 ✅ Connected to MySQL through SSH tunnel!
+2025/05/25 00:43:44 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/25 00:43:44            ⏳ Starting migration...          
+2025/05/25 00:43:44 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/25 00:44:00 ✅ Migration successful!
+2025/05/25 00:44:42 ✅ Connected to MySQL through SSH tunnel!

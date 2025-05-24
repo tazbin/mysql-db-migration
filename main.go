@@ -8,6 +8,7 @@ import (
 	set1 "db-migration/sets/set_1"
 	set2 "db-migration/sets/set_2"
 	set3 "db-migration/sets/set_3"
+	set4 "db-migration/sets/set_4"
 	"fmt"
 	"log"
 	"os"
@@ -43,6 +44,8 @@ func main() {
 		migrationSet = set2.GetMigrationSet()
 	case "set_3":
 		migrationSet = set3.GetMigrationSet()
+	case "set_4":
+		migrationSet = set4.GetMigrationSet()
 	// Add more cases here if you have multiple migration sets
 	default:
 		fmt.Printf("❗ Unknown migration set: %s\n", setName)
@@ -111,16 +114,6 @@ func main() {
 			log.Fatalf("❌ Migration failed: %v", err)
 		}
 
-		err = tx.Commit()
-		if err != nil {
-			log.Fatalf("❌ Failed to commit transaction: %v", err)
-		}
-
-		tx, err = db.DB.Begin()
-		if err != nil {
-			log.Fatalf("❌ Failed to start transaction: %v", err)
-		}
-
 		err = migrate.ValidateMigratedData(tx, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.PivotTableMappingValidationQuery, migrationSet.FieldLevelValidationQuery)
 		if err != nil {
 			tx.Rollback()
@@ -158,9 +151,9 @@ func main() {
 		err := migrate.RollbackMigration(db.DB, migrationSet.RollbackSteps)
 		if err != nil {
 			fmt.Println("⚠️  Rollback encountered an issue. See above for details.")
+		} else {
+			fmt.Println("\n✅ Undo migration completed successfully!")
 		}
-
-		fmt.Println("\n✅ Undo migration completed successfully!")
 
 	default:
 		fmt.Printf("❗ Unknown command: %s\n", command)
