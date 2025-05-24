@@ -70,55 +70,45 @@ func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) e
 func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string) error {
 	fmt.Printf("⚙️  Altering table: **%s**:\n", table)
 
-	changesMade := false
+	var alterClauses []string
 
+	// Check & prepare ADD COLUMN clauses
 	if len(addCols) > 0 {
 		fmt.Printf("⏳ Adding new columns to table **%s**:\n", table)
 		for col, typ := range addCols {
 			fmt.Printf("   ➕ %s %s\n", col, typ)
-		}
 
-		for col, typ := range addCols {
 			exists, err := columnExists(db, table, col)
 			if err != nil {
 				return fmt.Errorf("checking column %s existence failed: %w", col, err)
 			}
 			if !exists {
-				_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, col, typ))
-				if err != nil {
-					return fmt.Errorf("add column %s failed: %w", col, err)
-				}
-				changesMade = true
+				alterClauses = append(alterClauses, fmt.Sprintf("ADD COLUMN %s %s", col, typ))
 			} else {
 				fmt.Printf("	✅ column %s already exists\n", col)
 			}
 		}
-
-		if changesMade {
-			fmt.Printf("✅ Successfully added new columns to table **%s**.\n\n", table)
-		}
 	}
 
+	// Prepare MODIFY COLUMN clauses
 	if len(updateCols) > 0 {
 		fmt.Printf("⏳ Modifying existing columns in table **%s**:\n", table)
 		for col, typ := range updateCols {
 			fmt.Printf("   ✏️  %s => %s\n", col, typ)
-		}
-
-		for col, typ := range updateCols {
-			_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
-			if err != nil {
-				return fmt.Errorf("modify column %s failed: %w", col, err)
-			}
-			changesMade = true
-		}
-
-		if changesMade {
-			fmt.Printf("✅ Successfully updated columns in table **%s**.\n\n", table)
+			alterClauses = append(alterClauses, fmt.Sprintf("MODIFY COLUMN %s %s", col, typ))
 		}
 	}
 
-	if !changesMade {
+	// Execute combined ALTER TABLE statement if needed
+	if len(alterClauses) > 0 {
+		query := fmt.Sprintf("ALTER TABLE %s %s", table, strings.Join(alterClauses, ", "))
+		fmt.Println(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			return fmt.Errorf("executing ALTER TABLE failed: %w", err)
+		}
+		fmt.Printf("✅ Successfully altered table **%s**.\n\n", table)
+	} else {
 		fmt.Printf("ℹ️  No changes detected for table **%s**.\n\n", table)
 	}
 

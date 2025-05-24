@@ -192,3 +192,89 @@ CHECK (site_id > 0)
 2025/05/24 16:00:25            ⏳ Starting migration...          
 2025/05/24 16:00:25 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/24 16:00:38 ✅ Migration successful!
+2025/05/24 19:32:14 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:32:18 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:32:18            ⏳ Starting migration...          
+2025/05/24 19:32:18 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:32:30 ❌ Alter target table failed: modify column user_fname failed: Error 1283 (HY000): Column 'user_lname' cannot be part of FULLTEXT index
+2025/05/24 19:39:03 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:39:05 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:39:05            ⏳ Starting migration...          
+2025/05/24 19:39:05 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:39:17 ❌ Alter target table failed: modify column user_fname failed: Error 1283 (HY000): Column 'user_lname' cannot be part of FULLTEXT index
+2025/05/24 19:48:11 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:48:13 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:48:13            ⏳ Starting migration...          
+2025/05/24 19:48:13 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:48:31 ❌ Migration failed: failed to insert into pivot table: Error 1054 (42S22): Unknown column 'lk_users_2.id' in 'field list'
+2025/05/24 19:53:42 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:53:59 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:54:01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:54:01            ⏳ Starting migration...          
+2025/05/24 19:54:01 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:54:19 ❌ Migration validation failed: field-level validation failed: Error 1054 (42S22): Unknown column 'members.user_date_added_ts' in 'where clause'
+2025/05/24 19:55:21 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:55:36 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:55:37 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:55:37            ⏳ Starting migration...          
+2025/05/24 19:55:37 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:55:54 ❌ Migration validation failed: field-level validation failed: Error 1054 (42S22): Unknown column 'members.user_date_added_ts' in 'where clause'
+2025/05/24 19:56:35 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:56:48 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:56:50 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:56:50            ⏳ Starting migration...          
+2025/05/24 19:56:50 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:57:07 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 19:59:17 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:59:19 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:59:19            ⏳ Starting migration...          
+2025/05/24 19:59:19 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 19:59:23 ✅ Migration successful!
+2025/05/24 19:59:50 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 19:59:52 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 19:59:52            ⏳ Starting migration...          
+2025/05/24 19:59:52 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:00:15 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 20:00:45 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:00:46 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 20:00:46            ⏳ Starting migration...          
+2025/05/24 20:00:46 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:01:06 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 20:02:48 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:02:49 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 20:02:49            ⏳ Starting migration...          
+2025/05/24 20:02:49 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:03:06 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 20:04:36 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:04:37 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 20:04:37            ⏳ Starting migration...          
+2025/05/24 20:04:37 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:04:51 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 20:08:54 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:08:56 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 20:08:56            ⏳ Starting migration...          
+2025/05/24 20:08:56 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:09:11 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 20:53:55 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:54:12 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:54:15 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 20:54:15            ⏳ Starting migration...          
+2025/05/24 20:54:15 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:54:28 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 20:58:13 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:58:58 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 20:59:01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 20:59:01            ⏳ Starting migration...          
+2025/05/24 20:59:01 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 20:59:15 ❌ Migration validation failed: field-level mismatch detected
+2025/05/24 21:02:48 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 21:17:12 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 21:17:13 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 21:17:13            ⏳ Starting migration...          
+2025/05/24 21:17:13 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 21:17:20 ❌ Alter target table failed: executing ALTER TABLE failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'SET utf8mb4 COLLATE utf8mb4_unicode_ci, MODIFY COLUMN user_phone_cell VARCHAR(25' at line 1
+2025/05/24 21:17:45 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 21:17:47 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 21:17:47            ⏳ Starting migration...          
+2025/05/24 21:17:47 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 21:18:05 ✅ Migration successful!

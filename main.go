@@ -7,6 +7,7 @@ import (
 	"db-migration/sets"
 	set1 "db-migration/sets/set_1"
 	set2 "db-migration/sets/set_2"
+	set3 "db-migration/sets/set_3"
 	"fmt"
 	"log"
 	"os"
@@ -40,6 +41,8 @@ func main() {
 		migrationSet = set1.GetMigrationSet()
 	case "set_2":
 		migrationSet = set2.GetMigrationSet()
+	case "set_3":
+		migrationSet = set3.GetMigrationSet()
 	// Add more cases here if you have multiple migration sets
 	default:
 		fmt.Printf("❗ Unknown migration set: %s\n", setName)
@@ -106,6 +109,16 @@ func main() {
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration failed: %v", err)
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			log.Fatalf("❌ Failed to commit transaction: %v", err)
+		}
+
+		tx, err = db.DB.Begin()
+		if err != nil {
+			log.Fatalf("❌ Failed to start transaction: %v", err)
 		}
 
 		err = migrate.ValidateMigratedData(tx, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.PivotTableMappingValidationQuery, migrationSet.FieldLevelValidationQuery)
