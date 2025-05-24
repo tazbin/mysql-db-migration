@@ -118,3 +118,77 @@ CHECK (site_id > 0)
 2025/05/24 10:30:50            ⏳ Starting migration...          
 2025/05/24 10:30:50 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/24 10:31:01 ✅ Migration successful!
+2025/05/24 14:13:29 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 14:13:31 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 14:13:31            ⏳ Starting migration...          
+2025/05/24 14:13:31 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 14:13:40 ❌ Alter source table failed: add column migration_done failed: Error 1146 (42S02): Table 'galaxy_g2.sites_settings' doesn't exist
+2025/05/24 14:15:12 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 14:15:14 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 14:15:14            ⏳ Starting migration...          
+2025/05/24 14:15:14 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 14:15:23 ❌ Migration failed: failed to insert into target table: Error 1054 (42S22): Unknown column 'sites_settings.key' in 'field list'
+2025/05/24 14:20:10 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 14:20:12 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 14:20:12            ⏳ Starting migration...          
+2025/05/24 14:20:12 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 14:20:19 ❌ Alter target table failed: add column site_settings_id failed: Error 1146 (42S02): Table 'galaxy_g2.lk_domains_settings_2' doesn't exist
+2025/05/24 14:20:56 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 14:20:57 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 14:20:57            ⏳ Starting migration...          
+2025/05/24 14:20:57 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 14:21:05 ❌ Migration failed: failed to update source table: Error 1146 (42S02): Table 'galaxy_g2.sites_settings' doesn't exist
+2025/05/24 15:33:13 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:34:31 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:34:39 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:34:39            ⏳ Starting migration...          
+2025/05/24 15:34:39 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:34:41 ❌ Alter target table failed: add column site_settings_id failed: Error 1146 (42S02): Table 'galaxy_g2.lk_domains_settings_2' doesn't exist
+2025/05/24 15:35:11 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:35:12 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:35:12            ⏳ Starting migration...          
+2025/05/24 15:35:12 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:35:23 ❌ Migration validation failed: mismatch in migrated rows: source has 6, target has 0
+2025/05/24 15:41:00 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:41:01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:41:01            ⏳ Starting migration...          
+2025/05/24 15:41:01 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:41:13 ❌ Migration validation failed: failed to count valid foreign key references in pivot table: Error 1054 (42S22): Unknown column 'p.site_id' in 'on clause'
+2025/05/24 15:44:42 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:44:44 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:44:44            ⏳ Starting migration...          
+2025/05/24 15:44:44 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:44:55 ❌ Migration validation failed: failed to count valid foreign key references in pivot table: Error 1054 (42S22): Unknown column 'p.site_id' in 'on clause'
+2025/05/24 15:45:35 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:45:37 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:45:37            ⏳ Starting migration...          
+2025/05/24 15:45:37 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:45:48 ❌ Migration validation failed: failed to count valid foreign key references in pivot table: Error 1054 (42S22): Unknown column 'p.site_id' in 'on clause'
+2025/05/24 15:45:58 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:46:00 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:46:00            ⏳ Starting migration...          
+2025/05/24 15:46:00 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:46:10 ❌ Migration validation failed: failed to count valid foreign key references in pivot table: Error 1054 (42S22): Unknown column 'p.site_id' in 'on clause'
+2025/05/24 15:47:23 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:47:25 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:47:25            ⏳ Starting migration...          
+2025/05/24 15:47:25 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:47:37 ❌ Migration validation failed: failed to count valid foreign key references in pivot table: Error 1054 (42S22): Unknown column 'p.site_id' in 'on clause'
+2025/05/24 15:55:29 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:59:02 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:59:04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:59:04            ⏳ Starting migration...          
+2025/05/24 15:59:04 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:59:16 ✅ Migration successful!
+2025/05/24 15:59:29 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:59:43 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 15:59:44 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 15:59:44            ⏳ Starting migration...          
+2025/05/24 15:59:44 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 15:59:54 ✅ Migration successful!
+2025/05/24 16:00:08 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 16:00:23 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 16:00:25 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 16:00:25            ⏳ Starting migration...          
+2025/05/24 16:00:25 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 16:00:38 ✅ Migration successful!

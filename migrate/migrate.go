@@ -68,7 +68,7 @@ func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) e
 }
 
 func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string) error {
-	fmt.Printf("⚙️ Altering table: **%s**:\n", table)
+	fmt.Printf("⚙️  Altering table: **%s**:\n", table)
 
 	changesMade := false
 
@@ -89,6 +89,8 @@ func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string)
 					return fmt.Errorf("add column %s failed: %w", col, err)
 				}
 				changesMade = true
+			} else {
+				fmt.Printf("	✅ column %s already exists\n", col)
 			}
 		}
 
@@ -117,7 +119,7 @@ func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string)
 	}
 
 	if !changesMade {
-		fmt.Printf("ℹ️ No changes detected for table **%s**.\n\n", table)
+		fmt.Printf("ℹ️  No changes detected for table **%s**.\n\n", table)
 	}
 
 	return nil

@@ -80,15 +80,22 @@ func GetMigrationSet() sets.MigrationSet {
 			WHERE t.is_migrated = 1;
 		`, "mapping_lk_domains_sites", "lk_domains_2"),
 
+		PivotTableMappingValidationQuery: `
+				SELECT COUNT(*) 
+				FROM mapping_lk_domains_sites p 
+				JOIN lk_domains_2 t ON p.domain_id = t.domain_id 
+				JOIN sites s ON p.site_id = s.id;
+			`,
+
 		FieldLevelValidationQuery: fmt.Sprintf(`
 			SELECT s.id
 			FROM %s s
 			JOIN %s t ON s.id = t.sites_id
 			WHERE s.migration_done = 1 AND t.is_migrated = 1 AND (
-				NOT (t.domain_name <=> s.domain) OR
-				NOT (t.domain_cname <=> s.domain) OR
-				NOT (t.domain_alias <=> s.domain) OR
-				NOT (t.domain_sitename <=> s.name) OR
+				NOT (BINARY t.domain_name <=> BINARY s.domain) OR
+				NOT (BINARY t.domain_cname <=> BINARY s.domain) OR
+				NOT (BINARY t.domain_alias <=> BINARY s.domain) OR
+				NOT (BINARY t.domain_sitename <=> BINARY s.name) OR
 				NOT (DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
 				NOT (DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
 				NOT (t.domain_live <=> s.live) OR

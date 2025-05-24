@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable, fieldLevelValidationQuery string) error {
-	err := validateMigrationRowCount(tx, sourceTable, targetTable, pivotTable)
+func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery, fieldLevelValidationQuery string) error {
+	err := validateMigrationRowCount(tx, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable, fiel
 	return nil
 }
 
-func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable string) error {
+func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery string) error {
 	var sourceCount, targetCount, pivotCount, validReferenceCount int
 
 	err := tx.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE migration_done = 1", sourceTable)).Scan(&sourceCount)
@@ -49,14 +49,7 @@ func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable 
 
 	fmt.Printf("✅ Pivot table validated: %d mappings exist\n", pivotCount)
 
-	query := fmt.Sprintf(`
-				SELECT COUNT(*) 
-				FROM %s p 
-				JOIN %s t ON p.domain_id = t.domain_id 
-				JOIN %s s ON p.site_id = s.id;
-			`, pivotTable, targetTable, sourceTable)
-
-	err = tx.QueryRow(query).Scan(&validReferenceCount)
+	err = tx.QueryRow(PivotTableMappingValidationQuery).Scan(&validReferenceCount)
 	if err != nil {
 		return fmt.Errorf("failed to count valid foreign key references in pivot table: %w", err)
 	}
