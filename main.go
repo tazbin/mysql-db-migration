@@ -115,18 +115,18 @@ func main() {
 		FROM %s s
 		JOIN %s t ON s.id = t.sites_id
 		WHERE s.migration_done = 1 AND t.is_migrated = 1 AND (
-			-- NOT (s.status <=> t.domain_status) OR -- enum
-			NOT (s.domain <=> t.domain_name) OR
-			NOT (s.domain <=> t.domain_cname) OR
-			NOT (s.domain <=> t.domain_alias) OR
-			NOT (s.name <=> t.domain_sitename) OR
-			NOT (DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			NOT (DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			-- NOT (s.internal <=> t.domain_billing_type) OR -- enum
-			NOT (s.live <=> t.domain_live) OR
-			NOT (s.postal_code <=> t.domain_postal) OR
-			NOT (ROUND(s.lat, 5) <=> ROUND(t.lat, 5)) OR
-			NOT (ROUND(s.lng, 5) <=> ROUND(t.lng, 5))
+			-- NOT (t.domain_status <=> s.status) OR -- enum
+			NOT (t.domain_name <=> s.domain) OR
+			NOT (t.domain_cname <=> s.domain) OR
+			NOT (t.domain_alias <=> s.domain) OR
+			NOT (t.domain_sitename <=> s.name) OR
+			NOT (DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
+			NOT (DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
+			-- NOT (t.domain_billing_type <=> s.internal) OR -- enum
+			NOT (t.domain_live <=> s.live) OR
+			NOT (t.domain_postal <=> s.postal_code) OR
+			NOT (ROUND(t.lat, 5) <=> ROUND(s.lat, 5)) OR
+			NOT (ROUND(t.lng, 5) <=> ROUND(s.lng, 5))
 		)
 		LIMIT 3;
 	`, sourceTableName, targetTableName)
