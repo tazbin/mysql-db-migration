@@ -107,3 +107,14 @@ CHECK (site_id > 0)
 2025/05/24 01:39:04            ⏳ Starting migration...          
 2025/05/24 01:39:04 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/24 01:39:16 ✅ Migration successful!
+2025/05/24 10:30:07 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 10:30:10 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 10:30:10            ⏳ Starting migration...          
+2025/05/24 10:30:10 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 10:30:20 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '27979-1' for key 'mapping_lk_domains_sites.unique_domain_id_site_id'
+2025/05/24 10:30:35 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 10:30:49 ✅ Connected to MySQL through SSH tunnel!
+2025/05/24 10:30:50 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/24 10:30:50            ⏳ Starting migration...          
+2025/05/24 10:30:50 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/24 10:31:01 ✅ Migration successful!

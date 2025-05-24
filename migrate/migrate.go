@@ -2,6 +2,7 @@ package migrate
 
 import (
 	"database/sql"
+	"db-migration/sets"
 	"fmt"
 	"strings"
 )
@@ -67,26 +68,33 @@ func CreatePivotTable(db *sql.DB, tableName string, columns map[string]string) e
 }
 
 func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string) error {
+	fmt.Printf("⚙️ Altering table: **%s**:\n", table)
+
+	changesMade := false
+
 	if len(addCols) > 0 {
 		fmt.Printf("⏳ Adding new columns to table **%s**:\n", table)
 		for col, typ := range addCols {
 			fmt.Printf("   ➕ %s %s\n", col, typ)
 		}
-	}
-	for col, typ := range addCols {
-		exists, err := columnExists(db, table, col)
-		if err != nil {
-			return fmt.Errorf("checking column %s existence failed: %w", col, err)
-		}
-		if !exists {
-			_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, col, typ))
+
+		for col, typ := range addCols {
+			exists, err := columnExists(db, table, col)
 			if err != nil {
-				return fmt.Errorf("add column %s failed: %w", col, err)
+				return fmt.Errorf("checking column %s existence failed: %w", col, err)
+			}
+			if !exists {
+				_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, col, typ))
+				if err != nil {
+					return fmt.Errorf("add column %s failed: %w", col, err)
+				}
+				changesMade = true
 			}
 		}
-	}
-	if len(addCols) > 0 {
-		fmt.Printf("✅ Successfully added new columns to table **%s**.\n\n", table)
+
+		if changesMade {
+			fmt.Printf("✅ Successfully added new columns to table **%s**.\n\n", table)
+		}
 	}
 
 	if len(updateCols) > 0 {
@@ -94,15 +102,22 @@ func AlterTable(db *sql.DB, table string, addCols, updateCols map[string]string)
 		for col, typ := range updateCols {
 			fmt.Printf("   ✏️  %s => %s\n", col, typ)
 		}
-	}
-	for col, typ := range updateCols {
-		_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
-		if err != nil {
-			return fmt.Errorf("modify column %s failed: %w", col, err)
+
+		for col, typ := range updateCols {
+			_, err := db.Exec(fmt.Sprintf("ALTER TABLE %s MODIFY COLUMN %s %s", table, col, typ))
+			if err != nil {
+				return fmt.Errorf("modify column %s failed: %w", col, err)
+			}
+			changesMade = true
+		}
+
+		if changesMade {
+			fmt.Printf("✅ Successfully updated columns in table **%s**.\n\n", table)
 		}
 	}
-	if len(updateCols) > 0 {
-		fmt.Printf("✅ Successfully updated columns in table **%s**.\n\n", table)
+
+	if !changesMade {
+		fmt.Printf("ℹ️ No changes detected for table **%s**.\n\n", table)
 	}
 
 	return nil
@@ -130,7 +145,7 @@ func MigrateData(tx *sql.Tx, insertQuery, updateSourceQuery, insertPivotQuery st
 	return nil
 }
 
-func RollbackMigration(db *sql.DB, steps []RollbackStep) error {
+func RollbackMigration(db *sql.DB, steps []sets.SingleRollbackStep) error {
 	for _, step := range steps {
 		if _, err := db.Exec(step.Query); err != nil {
 			fmt.Printf("❌ Rollback step failed: %s %s\n", step.Description, step.Table)

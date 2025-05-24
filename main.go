@@ -4,6 +4,8 @@ import (
 	"db-migration/db"
 	"db-migration/logger"
 	"db-migration/migrate"
+	"db-migration/sets"
+	set1 "db-migration/sets/set_1"
 	"fmt"
 	"log"
 	"os"
@@ -11,14 +13,36 @@ import (
 
 func main() {
 
-	if len(os.Args) < 2 {
-		fmt.Println("❗ Please provide a command: \n   → do-migrate \n   → undo-migrate")
+	logFile := "migration.log"
+
+	err := logger.Init(logFile)
+	if err != nil {
+		log.Fatalf("❌ Failed to initialize logger: %v", err)
+	}
+	defer logger.Close()
+
+	log.SetOutput(logger.Logger.Writer())
+
+	if len(os.Args) < 3 {
+		fmt.Println("❗ Please provide a command and migration set name: \n   → do-migrate set1\n   → undo-migrate set1")
 		return
 	}
 
 	command := os.Args[1]
+	setName := os.Args[2]
 
-	// Config setup
+	// Load migration set based on setName
+	var migrationSet sets.MigrationSet
+
+	switch setName {
+	case "set_1":
+		migrationSet = set1.GetMigrationSet()
+	// Add more cases here if you have multiple migration sets
+	default:
+		fmt.Printf("❗ Unknown migration set: %s\n", setName)
+		return
+	}
+
 	cfg := db.Config{
 		SSHUser:    "ec2-user",
 		SSHHost:    "bastion.dev.galaxydigital.com",
@@ -31,143 +55,15 @@ func main() {
 		DBName:     "galaxy_g2",
 	}
 
-	// Connect to DB
 	db.Connect(cfg)
-
-	sourceTableName := "sites"
-	targetTableName := "lk_domains_2"
-	pivotTableName := "mapping_lk_domains_sites"
-
-	pivotTableColumns := map[string]string{
-		// id
-		"domain_id": "INT UNSIGNED NOT NULL",    // target table id
-		"site_id":   "BIGINT UNSIGNED NOT NULL", // source table id
-		// created_at
-		// updated_at
-	}
-
-	newColumnsForTargetTable := map[string]string{
-		"is_migrated":            "TINYINT(1) DEFAULT 0",
-		"sites_id":               "BIGINT UNSIGNED",
-		"domain_date_added_ts":   "TIMESTAMP",
-		"domain_date_updated_ts": "TIMESTAMP",
-	}
-
-	updateColumnsForTargetTable := map[string]string{
-		"domain_postal": "VARCHAR(255)",
-	}
-
-	newColumnsForSourceTable := map[string]string{
-		"migration_done": "TINYINT(1) DEFAULT 0",
-	}
-
-	insertToTargetQuery := fmt.Sprintf(`
-								INSERT INTO %s (
-									sites_id,
-									domain_status,
-									domain_name,
-									domain_cname,
-									domain_alias,
-									domain_sitename,
-									domain_date_added_ts,
-									domain_date_updated_ts,
-									domain_billing_type,
-									domain_live,
-									domain_postal,
-									lat,
-									lng,
-									is_migrated
-								)
-								SELECT
-									id,
-									status,
-									domain,
-									domain,
-									domain,
-									name,
-									created_at,
-									updated_at,
-									internal,
-									live,
-									postal_code,
-									lat,
-									lng,
-									1
-								FROM %s
-								WHERE migration_done = 0;
-								`, targetTableName, sourceTableName)
-
-	updateSourceQuery := fmt.Sprintf(`
-								UPDATE %s s
-								JOIN %s t ON s.id = t.sites_id
-								SET s.migration_done = 1;
-								`, sourceTableName, targetTableName)
-
-	insertToPivotQuery := fmt.Sprintf(`
-								INSERT INTO %s (domain_id, site_id)
-								SELECT t.domain_id, t.sites_id
-								FROM %s t
-								WHERE t.is_migrated = 1;
-								`, pivotTableName, targetTableName)
-
-	fieldLevelValidationQuery := fmt.Sprintf(`
-		SELECT s.id
-		FROM %s s
-		JOIN %s t ON s.id = t.sites_id
-		WHERE s.migration_done = 1 AND t.is_migrated = 1 AND (
-			-- NOT (t.domain_status <=> s.status) OR -- enum
-			NOT (t.domain_name <=> s.domain) OR
-			NOT (t.domain_cname <=> s.domain) OR
-			NOT (t.domain_alias <=> s.domain) OR
-			NOT (t.domain_sitename <=> s.name) OR
-			NOT (DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			NOT (DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-			-- NOT (t.domain_billing_type <=> s.internal) OR -- enum
-			NOT (t.domain_live <=> s.live) OR
-			NOT (t.domain_postal <=> s.postal_code) OR
-			NOT (ROUND(t.lat, 5) <=> ROUND(s.lat, 5)) OR
-			NOT (ROUND(t.lng, 5) <=> ROUND(s.lng, 5))
-		)
-		LIMIT 3;
-	`, sourceTableName, targetTableName)
-
-	rollbackSteps := []migrate.RollbackStep{
-		{
-			Query:       fmt.Sprintf(`DELETE FROM %s WHERE is_migrated = 1`, targetTableName),
-			Description: "🗑️  Deleted migrated rows from",
-			Table:       targetTableName,
-		},
-		{
-			Query:       fmt.Sprintf(`UPDATE %s SET migration_done = 0 WHERE migration_done = 1`, sourceTableName),
-			Description: "♻️  Reset migration_done = 0 in",
-			Table:       sourceTableName,
-		},
-		{
-			Query:       fmt.Sprintf(`DELETE FROM %s`, pivotTableName),
-			Description: "🧹 Deleted rows from",
-			Table:       pivotTableName,
-		},
-	}
-
-	// Setup logging
-	logFile := "migration.log"
-
-	err := logger.Init(logFile)
-	if err != nil {
-		log.Fatalf("❌ Failed to initialize logger: %v", err)
-	}
-	defer logger.Close()
-
-	// Replace default log output to use our logger
-	log.SetOutput(logger.Logger.Writer())
 
 	switch command {
 	case "do-migrate":
 		fmt.Printf("⚠️  You are about to migrate data:\n")
-		fmt.Printf("   → FROM: %s\n", sourceTableName)
-		fmt.Printf("   → TO:   %s\n", targetTableName)
-		if pivotTableName != "" {
-			fmt.Printf("   → VIA:  %s\n", pivotTableName)
+		fmt.Printf("   → FROM: %s\n", migrationSet.SourceTableName)
+		fmt.Printf("   → TO:   %s\n", migrationSet.TargetTableName)
+		if migrationSet.PivotTableName != "" {
+			fmt.Printf("   → VIA:  %s\n", migrationSet.PivotTableName)
 		}
 
 		fmt.Print("Proceed with migration? (y/N): ")
@@ -183,17 +79,17 @@ func main() {
 		log.Println("           ⏳ Starting migration...          ")
 		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
-		err := migrate.CreatePivotTable(db.DB, pivotTableName, pivotTableColumns)
+		err := migrate.CreatePivotTable(db.DB, migrationSet.PivotTableName, migrationSet.PivotTableColumns)
 		if err != nil {
 			log.Fatalf("❌ Pivot table creation failed: %v", err)
 		}
 
-		err = migrate.AlterTable(db.DB, targetTableName, newColumnsForTargetTable, updateColumnsForTargetTable)
+		err = migrate.AlterTable(db.DB, migrationSet.TargetTableName, migrationSet.NewColumnsForTargetTable, migrationSet.UpdateColumnsForTargetTable)
 		if err != nil {
 			log.Fatalf("❌ Alter target table failed: %v", err)
 		}
 
-		err = migrate.AlterTable(db.DB, sourceTableName, newColumnsForSourceTable, map[string]string{})
+		err = migrate.AlterTable(db.DB, migrationSet.SourceTableName, migrationSet.NewColumnsForSourceTable, map[string]string{})
 		if err != nil {
 			log.Fatalf("❌ Alter source table failed: %v", err)
 		}
@@ -203,13 +99,13 @@ func main() {
 			log.Fatalf("❌ Failed to start transaction: %v", err)
 		}
 
-		err = migrate.MigrateData(tx, insertToTargetQuery, updateSourceQuery, insertToPivotQuery)
+		err = migrate.MigrateData(tx, migrationSet.InsertToTargetQuery, migrationSet.UpdateSourceQuery, migrationSet.InsertToPivotQuery)
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration failed: %v", err)
 		}
 
-		err = migrate.ValidateMigratedData(tx, sourceTableName, targetTableName, pivotTableName, fieldLevelValidationQuery)
+		err = migrate.ValidateMigratedData(tx, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.FieldLevelValidationQuery)
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration validation failed: %v", err)
@@ -225,7 +121,7 @@ func main() {
 	case "undo-migrate":
 		fmt.Printf("⚠️  You are about to undo the migration involving these queries:\n\n")
 
-		for _, step := range rollbackSteps {
+		for _, step := range migrationSet.RollbackSteps {
 			fmt.Printf("→ %s %s:\n", step.Description, step.Table)
 			fmt.Printf("   %s\n\n", step.Query)
 		}
@@ -243,7 +139,7 @@ func main() {
 		fmt.Println("           ⚠️  Starting rollback...          ")
 		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
-		err := migrate.RollbackMigration(db.DB, rollbackSteps)
+		err := migrate.RollbackMigration(db.DB, migrationSet.RollbackSteps)
 		if err != nil {
 			fmt.Println("⚠️  Rollback encountered an issue. See above for details.")
 		}
