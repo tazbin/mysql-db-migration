@@ -467,3 +467,42 @@ CHECK (site_id > 0)
 2025/05/28 00:05:39            ⏳ Starting migration...          
 2025/05/28 00:05:39 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/28 00:05:50 ✅ Migration successful!
+2025/05/28 01:53:16 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 01:53:38 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 01:53:38            ⏳ Starting migration...          
+2025/05/28 01:53:38 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 01:53:48 ❌ Migration failed: failed to insert into target table: Error 1054 (42S22): Unknown column 'shift.starts_at' in 'field list'
+2025/05/28 01:55:02 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 01:55:04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 01:55:04            ⏳ Starting migration...          
+2025/05/28 01:55:04 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 01:55:40 ❌ Migration validation failed: field-level validation failed: Error 1054 (42S22): Unknown column 'lk_module_uw_needs_schedule_2.sch_time_end_ts' in 'where clause'
+2025/05/28 01:58:01 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 01:58:03 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 01:58:03            ⏳ Starting migration...          
+2025/05/28 01:58:03 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 01:58:33 ❌ Migration validation failed: field-level mismatch detected
+2025/05/28 02:03:27 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:03:38 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:03:41 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 02:03:41            ⏳ Starting migration...          
+2025/05/28 02:03:41 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 02:04:04 ❌ Migration validation failed: field-level mismatch detected
+2025/05/28 02:06:16 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:06:51 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:06:53 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 02:06:53            ⏳ Starting migration...          
+2025/05/28 02:06:53 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 02:07:15 ❌ Migration validation failed: field-level mismatch detected
+2025/05/28 02:09:01 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:09:54 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:09:59 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 02:09:59            ⏳ Starting migration...          
+2025/05/28 02:09:59 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 02:10:26 ✅ Migration successful!
+2025/05/28 02:10:56 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:11:17 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 02:11:20 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 02:11:20            ⏳ Starting migration...          
+2025/05/28 02:11:20 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 02:11:40 ✅ Migration successful!
