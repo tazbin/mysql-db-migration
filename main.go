@@ -10,6 +10,7 @@ import (
 	set3 "db-migration/sets/set_3"
 	set4 "db-migration/sets/set_4"
 	set5 "db-migration/sets/set_5"
+	set6 "db-migration/sets/set_6"
 	"fmt"
 	"log"
 	"os"
@@ -49,6 +50,8 @@ func main() {
 		migrationSet = set4.GetMigrationSet()
 	case "set_5":
 		migrationSet = set5.GetMigrationSet()
+	case "set_6":
+		migrationSet = set6.GetMigrationSet()
 	// Add more cases here if you have multiple migration sets
 	default:
 		fmt.Printf("❗ Unknown migration set: %s\n", setName)

@@ -387,3 +387,83 @@ CHECK (site_id > 0)
 2025/05/27 10:15:53 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/27 10:16:04 ✅ Migration successful!
 2025/05/27 10:16:14 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:30:54 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:31:00 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:31:00            ⏳ Starting migration...          
+2025/05/27 23:31:00 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:31:15 ❌ Migration validation failed: field-level mismatch detected
+2025/05/27 23:34:58 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:34:59 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:34:59            ⏳ Starting migration...          
+2025/05/27 23:34:59 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:35:12 ❌ Migration validation failed: field-level mismatch detected
+2025/05/27 23:37:25 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:37:27 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:37:27            ⏳ Starting migration...          
+2025/05/27 23:37:27 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:37:40 ❌ Migration validation failed: field-level mismatch detected
+2025/05/27 23:40:50 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:44:11 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:44:12 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:44:12            ⏳ Starting migration...          
+2025/05/27 23:44:12 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:44:26 ❌ Migration validation failed: field-level mismatch detected
+2025/05/27 23:46:26 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:47:58 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:48:00 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:48:00            ⏳ Starting migration...          
+2025/05/27 23:48:00 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:48:12 ✅ Migration successful!
+2025/05/27 23:48:23 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:49:25 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:49:27 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:49:27            ⏳ Starting migration...          
+2025/05/27 23:49:27 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:49:39 ✅ Migration successful!
+2025/05/27 23:49:58 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:49:59 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:49:59            ⏳ Starting migration...          
+2025/05/27 23:49:59 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:50:12 ✅ Migration successful!
+2025/05/27 23:50:32 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:50:33 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:50:33            ⏳ Starting migration...          
+2025/05/27 23:50:33 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:50:46 ✅ Migration successful!
+2025/05/27 23:51:02 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:51:05 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:51:05            ⏳ Starting migration...          
+2025/05/27 23:51:05 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:51:20 ✅ Migration successful!
+2025/05/27 23:51:38 ✅ Connected to MySQL through SSH tunnel!
+2025/05/27 23:51:39 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/27 23:51:39            ⏳ Starting migration...          
+2025/05/27 23:51:39 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/27 23:51:51 ❌ Migration validation failed: field-level mismatch detected
+2025/05/28 00:03:01 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 00:03:03 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 00:03:03            ⏳ Starting migration...          
+2025/05/28 00:03:03 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 00:03:16 ❌ Migration validation failed: field-level validation failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OR NOT (BINARY lk_module_uw_needs_2.need_body <=> BINARY events.description)
+			' at line 16
+2025/05/28 00:03:39 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 00:03:41 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 00:03:41            ⏳ Starting migration...          
+2025/05/28 00:03:41 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 00:03:54 ✅ Migration successful!
+2025/05/28 00:04:18 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 00:04:23 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 00:04:23            ⏳ Starting migration...          
+2025/05/28 00:04:23 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 00:04:33 ✅ Migration successful!
+2025/05/28 00:04:45 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 00:04:47 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 00:04:47            ⏳ Starting migration...          
+2025/05/28 00:04:47 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 00:04:57 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '1138688-1' for key 'mapping_lk_module_uw_needs_event.unique_need_id_event_id'
+2025/05/28 00:05:23 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 00:05:36 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 00:05:39 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 00:05:39            ⏳ Starting migration...          
+2025/05/28 00:05:39 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 00:05:50 ✅ Migration successful!
