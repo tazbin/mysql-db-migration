@@ -517,3 +517,16 @@ CHECK (site_id > 0)
 2025/05/28 04:51:59 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/28 04:52:08 ✅ Migration successful!
 2025/05/28 04:52:36 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 10:38:17 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 10:38:21 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 10:38:21            ⏳ Starting migration...          
+2025/05/28 10:38:21 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 10:38:32 ❌ Migration validation failed: field-level validation failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE
+				time_entries.migration_done = 1
+				AND lk_module_uw_timetrack_2.is_mi' at line 10
+2025/05/28 10:39:45 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 10:39:57 ✅ Connected to MySQL through SSH tunnel!
+2025/05/28 10:39:58 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/28 10:39:58            ⏳ Starting migration...          
+2025/05/28 10:39:58 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/28 10:40:09 ✅ Migration successful!
