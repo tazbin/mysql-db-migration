@@ -6,6 +6,7 @@ import (
 	"db-migration/migrate"
 	"db-migration/sets"
 	set1 "db-migration/sets/set_1"
+	set10 "db-migration/sets/set_10"
 	set2 "db-migration/sets/set_2"
 	set3 "db-migration/sets/set_3"
 	set4 "db-migration/sets/set_4"
@@ -61,10 +62,17 @@ func main() {
 		migrationSet = set8.GetMigrationSet()
 	case "set_9":
 		migrationSet = set9.GetMigrationSet()
+	case "set_10":
+		migrationSet = set10.GetMigrationSet()
 	// Add more cases here if you have multiple migration sets
 	default:
 		fmt.Printf("❗ Unknown migration set: %s\n", setName)
 		return
+	}
+
+	dbName := "galaxy_g2"
+	if setName == "set_10" {
+		dbName = "galaxy_email"
 	}
 
 	cfg := db.Config{
@@ -76,7 +84,7 @@ func main() {
 		DBPassword: "yourpassword",
 		DBHost:     "mysql.dev.galaxydigital.com",
 		DBPort:     3306,
-		DBName:     "galaxy_g2",
+		DBName:     dbName,
 	}
 
 	db.Connect(cfg)

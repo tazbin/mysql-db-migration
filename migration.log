@@ -530,3 +530,20 @@ CHECK (site_id > 0)
 2025/05/28 10:39:58            ⏳ Starting migration...          
 2025/05/28 10:39:58 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/28 10:40:09 ✅ Migration successful!
+2025/05/29 09:55:34 ✅ Connected to MySQL through SSH tunnel!
+2025/05/29 09:55:40 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/29 09:55:40            ⏳ Starting migration...          
+2025/05/29 09:55:40 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/29 09:55:50 ❌ Migration validation failed: field-level mismatch detected
+2025/05/29 09:57:11 ✅ Connected to MySQL through SSH tunnel!
+2025/05/29 09:57:13 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/29 09:57:13            ⏳ Starting migration...          
+2025/05/29 09:57:13 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/29 09:57:21 ✅ Migration successful!
+2025/05/29 09:58:03 ✅ Connected to MySQL through SSH tunnel!
+2025/05/29 09:58:48 ✅ Connected to MySQL through SSH tunnel!
+2025/05/29 09:59:03 ✅ Connected to MySQL through SSH tunnel!
+2025/05/29 09:59:04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/05/29 09:59:04            ⏳ Starting migration...          
+2025/05/29 09:59:04 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/05/29 09:59:15 ✅ Migration successful!

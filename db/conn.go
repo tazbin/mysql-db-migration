@@ -31,7 +31,7 @@ type Config struct {
 
 // Connect initializes the SSH tunnel and DB connection
 func Connect(cfg Config) {
-	fmt.Println("⏳ Connecting to database...")
+	fmt.Printf("⏳ Connecting to %s database...\n", cfg.DBName)
 
 	// Read the private key
 	key, err := ioutil.ReadFile(cfg.SSHKeyPath)
