@@ -64,7 +64,6 @@ func main() {
 		migrationSet = set9.GetMigrationSet()
 	case "set_10":
 		migrationSet = set10.GetMigrationSet()
-	// Add more cases here if you have multiple migration sets
 	default:
 		fmt.Printf("❗ Unknown migration set: %s\n", setName)
 		return
@@ -137,15 +136,15 @@ func main() {
 			log.Fatalf("❌ Migration failed: %v", err)
 		}
 
-		err = migrate.ValidateMigratedData(tx, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.PivotTableMappingValidationQuery, migrationSet.FieldLevelValidationQuery)
-		if err != nil {
-			tx.Rollback()
-			log.Fatalf("❌ Migration validation failed: %v", err)
-		}
-
 		err = tx.Commit()
 		if err != nil {
 			log.Fatalf("❌ Failed to commit transaction: %v", err)
+		}
+
+		err = migrate.ValidateMigratedData(db.DB, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.PivotTableMappingValidationQuery, migrationSet.FieldLevelValidationQuery)
+		if err != nil {
+			tx.Rollback()
+			log.Fatalf("❌ Migration validation failed: %v", err)
 		}
 
 		log.Println("✅ Migration successful!")
@@ -155,7 +154,18 @@ func main() {
 
 		for _, step := range migrationSet.RollbackSteps {
 			fmt.Printf("→ %s %s:\n", step.Description, step.Table)
-			fmt.Printf("   %s\n\n", step.Query)
+			fmt.Printf("     %s\n", step.Query)
+			countQuery := migrate.GenerateCountQuery(step.Query)
+
+			var count int
+			if err := db.DB.QueryRow(countQuery).Scan(&count); err != nil {
+				fmt.Printf("⚠️  Could not count affected rows for: %s %s\n", step.Description, step.Table)
+				fmt.Println("🔎 Error:", err)
+				fmt.Printf("\n")
+			} else {
+				action := migrate.GetActionFromQuery(step.Query)
+				fmt.Printf("  🧾 %d rows will be %s from %s\n\n", count, action, step.Table)
+			}
 		}
 
 		fmt.Print("Proceed with undo migration? (y/N): ")

@@ -5,13 +5,13 @@ import (
 	"fmt"
 )
 
-func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery, fieldLevelValidationQuery string) error {
-	err := validateMigrationRowCount(tx, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery)
+func ValidateMigratedData(db *sql.DB, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery, fieldLevelValidationQuery string) error {
+	err := validateMigrationRowCount(db, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery)
 	if err != nil {
 		return err
 	}
 
-	err = checkFieldLevelEquality(tx, fieldLevelValidationQuery)
+	err = checkFieldLevelEquality(db, fieldLevelValidationQuery)
 	if err != nil {
 		return err
 	}
@@ -19,15 +19,15 @@ func ValidateMigratedData(tx *sql.Tx, sourceTable, targetTable, pivotTable, Pivo
 	return nil
 }
 
-func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery string) error {
+func validateMigrationRowCount(db *sql.DB, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery string) error {
 	var sourceCount, targetCount, pivotCount, validReferenceCount int
 
-	err := tx.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE migration_done = 1", sourceTable)).Scan(&sourceCount)
+	err := db.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE migration_done = 1", sourceTable)).Scan(&sourceCount)
 	if err != nil {
 		return fmt.Errorf("failed to count migrated rows in source: %w", err)
 	}
 
-	err = tx.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE is_migrated = 1", targetTable)).Scan(&targetCount)
+	err = db.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE is_migrated = 1", targetTable)).Scan(&targetCount)
 	if err != nil {
 		return fmt.Errorf("failed to count migrated rows in target: %w", err)
 	}
@@ -38,7 +38,7 @@ func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable,
 
 	fmt.Printf("✅ Migration validated: %d rows migrated successfully\n", sourceCount)
 
-	err = tx.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s", pivotTable)).Scan(&pivotCount)
+	err = db.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s", pivotTable)).Scan(&pivotCount)
 	if err != nil {
 		return fmt.Errorf("failed to count rows in pivot table: %w", err)
 	}
@@ -49,7 +49,7 @@ func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable,
 
 	fmt.Printf("✅ Pivot table validated: %d mappings exist\n", pivotCount)
 
-	err = tx.QueryRow(PivotTableMappingValidationQuery).Scan(&validReferenceCount)
+	err = db.QueryRow(PivotTableMappingValidationQuery).Scan(&validReferenceCount)
 	if err != nil {
 		return fmt.Errorf("failed to count valid foreign key references in pivot table: %w", err)
 	}
@@ -63,8 +63,8 @@ func validateMigrationRowCount(tx *sql.Tx, sourceTable, targetTable, pivotTable,
 	return nil
 }
 
-func checkFieldLevelEquality(tx *sql.Tx, fieldLevelValidationQuery string) error {
-	rows, err := tx.Query(fieldLevelValidationQuery)
+func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery string) error {
+	rows, err := db.Query(fieldLevelValidationQuery)
 	if err != nil {
 		return fmt.Errorf("field-level validation failed: %w", err)
 	}

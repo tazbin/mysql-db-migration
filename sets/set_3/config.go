@@ -123,7 +123,7 @@ func GetMigrationSet() sets.MigrationSet {
 					OR NOT(BINARY lk_users_2.user_phone_cell <=> BINARY members.mobile_phone)
 					OR NOT(DATE_FORMAT(lk_users_2.user_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_joined_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_users_2.user_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')))
-			LIMIT 3;
+			LIMIT 50;
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

@@ -136,8 +136,36 @@ func MigrateData(tx *sql.Tx, insertQuery, updateSourceQuery, insertPivotQuery st
 	return nil
 }
 
+func GetActionFromQuery(query string) string {
+	q := strings.ToUpper(strings.TrimSpace(query))
+	switch {
+	case strings.HasPrefix(q, "DELETE"):
+		return "deleted"
+	case strings.HasPrefix(q, "UPDATE"):
+		return "updated"
+	default:
+		return "affected"
+	}
+}
+
+func GenerateCountQuery(originalQuery string) string {
+	query := strings.TrimSpace(originalQuery)
+	if strings.HasPrefix(strings.ToUpper(query), "DELETE FROM") {
+		return strings.Replace(query, "DELETE FROM", "SELECT COUNT(*) FROM", 1)
+	}
+	if strings.HasPrefix(strings.ToUpper(query), "UPDATE") {
+		if idx := strings.Index(strings.ToUpper(query), "WHERE"); idx != -1 {
+			table := strings.Fields(query)[1]
+			whereClause := query[idx:]
+			return fmt.Sprintf("SELECT COUNT(*) FROM %s %s", table, whereClause)
+		}
+	}
+	return "SELECT 0" // fallback
+}
+
 func RollbackMigration(db *sql.DB, steps []sets.SingleRollbackStep) error {
 	for _, step := range steps {
+		// Execute the rollback query
 		if _, err := db.Exec(step.Query); err != nil {
 			fmt.Printf("❌ Rollback step failed: %s %s\n", step.Description, step.Table)
 			fmt.Println("🔎 Error:", err)
@@ -153,7 +181,8 @@ func RollbackMigration(db *sql.DB, steps []sets.SingleRollbackStep) error {
 
 			return fmt.Errorf("rollback failed at step [%s %s]: %w", step.Description, step.Table, err)
 		}
-		fmt.Printf("%s %s\n", step.Description, step.Table)
+
+		fmt.Printf("✅ %s %s\n", step.Description, step.Table)
 	}
 
 	return nil

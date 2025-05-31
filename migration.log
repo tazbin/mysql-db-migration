@@ -547,3 +547,21 @@ CHECK (site_id > 0)
 2025/05/29 09:59:04            ⏳ Starting migration...          
 2025/05/29 09:59:04 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/05/29 09:59:15 ✅ Migration successful!
+2025/06/01 01:53:41 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 01:53:44 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/01 01:53:44            ⏳ Starting migration...          
+2025/06/01 01:53:44 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/01 01:53:59 ❌ Migration failed: failed to insert into pivot table: Error 1062 (23000): Duplicate entry '7505302-1' for key 'mapping_lk_users_members.unique_user_id_member_id'
+2025/06/01 01:54:17 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 01:58:56 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:02:16 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:05:01 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:06:18 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:07:14 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:08:15 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:08:36 ✅ Connected to MySQL through SSH tunnel!
+2025/06/01 02:08:38 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/01 02:08:38            ⏳ Starting migration...          
+2025/06/01 02:08:38 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/01 02:08:50 ❌ Migration validation failed: field-level mismatch detected
+2025/06/01 02:09:25 ✅ Connected to MySQL through SSH tunnel!
