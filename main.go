@@ -106,9 +106,9 @@ func main() {
 		}
 
 		fmt.Println()
-		log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-		log.Println("           ⏳ Starting migration...          ")
-		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+		log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		log.Printf("           ⏳ Starting migration for %s...     \n", setName)
+		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
 		err := migrate.CreatePivotTable(db.DB, migrationSet.PivotTableName, migrationSet.PivotTableColumns)
 		if err != nil {
@@ -177,15 +177,15 @@ func main() {
 		}
 
 		fmt.Println()
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-		fmt.Println("           ⚠️  Starting rollback...          ")
-		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+		log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		log.Printf("           ⚠️  Starting rollback for %s...        \n", setName)
+		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
 		err := migrate.RollbackMigration(db.DB, migrationSet.RollbackSteps)
 		if err != nil {
 			fmt.Println("⚠️  Rollback encountered an issue. See above for details.")
 		} else {
-			fmt.Println("\n✅ Undo migration completed successfully!")
+			log.Println("\n✅ Undo migration completed successfully!")
 		}
 
 	default:
