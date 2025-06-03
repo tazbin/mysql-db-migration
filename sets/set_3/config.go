@@ -110,7 +110,15 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				members.id
+				members.id,
+				NOT(lk_users_2.user_domain <=> mapping_lk_domains_sites.domain_id) AS domain_mismatch,
+				NOT(BINARY lk_users_2.user_fname <=> BINARY members.first_name) AS fname_mismatch,
+				NOT(BINARY lk_users_2.user_status <=> BINARY members.status) AS status_mismatch,
+				NOT(BINARY lk_users_2.user_lname <=> BINARY members.last_name) AS lname_mismatch,
+				NOT(BINARY lk_users_2.user_email <=> BINARY members.email) AS email_mismatch,
+				NOT(BINARY lk_users_2.user_phone_cell <=> BINARY members.mobile_phone) AS phone_mismatch,
+				NOT(DATE_FORMAT(lk_users_2.user_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_joined_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_added_mismatch,
+				NOT(DATE_FORMAT(lk_users_2.user_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_updated_mismatch
 			FROM
 				members
 				JOIN lk_users_2 ON lk_users_2.member_id = members.id
@@ -120,7 +128,7 @@ func GetMigrationSet() sets.MigrationSet {
 				AND lk_users_2.is_migrated = 1
 				AND(NOT(lk_users_2.user_domain <=> mapping_lk_domains_sites.domain_id)
 					OR NOT(BINARY lk_users_2.user_fname <=> BINARY members.first_name)
-			-- 		OR NOT(BINARY lk_users_2.user_status <=> BINARY members.status) -- enum
+			 		OR NOT(BINARY lk_users_2.user_status <=> BINARY members.status) -- enum
 					OR NOT(BINARY lk_users_2.user_lname <=> BINARY members.last_name)
 					OR NOT(BINARY lk_users_2.user_email <=> BINARY members.email)
 					OR NOT(BINARY lk_users_2.user_phone_cell <=> BINARY members.mobile_phone)

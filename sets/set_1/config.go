@@ -87,23 +87,39 @@ func GetMigrationSet() sets.MigrationSet {
 				JOIN sites s ON p.site_id = s.id;
 			`,
 
-		FieldLevelValidationQuery: fmt.Sprintf(`
-			SELECT s.id
-			FROM %s s
-			JOIN %s t ON s.id = t.sites_id
-			WHERE s.migration_done = 1 AND t.is_migrated = 1 AND (
-				NOT (BINARY t.domain_name <=> BINARY s.domain) OR
-				NOT (BINARY t.domain_cname <=> BINARY s.domain) OR
-				NOT (BINARY t.domain_alias <=> BINARY s.domain) OR
-				NOT (BINARY t.domain_sitename <=> BINARY s.name) OR
-				NOT (DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-				NOT (DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) OR
-				NOT (t.domain_live <=> s.live) OR
-				NOT (t.domain_postal <=> s.postal_code) OR
-				NOT (ROUND(t.lat, 5) <=> ROUND(s.lat, 5)) OR
-				NOT (ROUND(t.lng, 5) <=> ROUND(s.lng, 5))
+		FieldLevelValidationQuery: `
+			SELECT 
+				s.id,
+				NOT (BINARY t.domain_name <=> BINARY s.domain) AS name_mismatch,
+				NOT (BINARY t.domain_cname <=> BINARY s.domain) AS cname_mismatch,
+				NOT (BINARY t.domain_alias <=> BINARY s.domain) AS alias_mismatch,
+				NOT (BINARY t.domain_sitename <=> BINARY s.name) AS sitename_mismatch,
+				NOT (DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_added_mismatch,
+				NOT (DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_updated_mismatch,
+				NOT (t.domain_live <=> s.live) AS live_mismatch,
+				NOT (t.domain_postal <=> s.postal_code) AS postal_mismatch,
+				NOT (ROUND(t.lat, 5) <=> ROUND(s.lat, 5)) AS lat_mismatch,
+				NOT (ROUND(t.lng, 5) <=> ROUND(s.lng, 5)) AS lng_mismatch
+			FROM 
+				sites s
+			JOIN 
+				lk_domains_2 t ON s.id = t.sites_id
+			WHERE 
+				s.migration_done = 1 
+				AND t.is_migrated = 1 
+				AND (
+					NOT (BINARY t.domain_name <=> BINARY s.domain) 
+					OR NOT (BINARY t.domain_cname <=> BINARY s.domain) 
+					OR NOT (BINARY t.domain_alias <=> BINARY s.domain) 
+					OR NOT (BINARY t.domain_sitename <=> BINARY s.name) 
+					OR NOT (DATE_FORMAT(t.domain_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) 
+					OR NOT (DATE_FORMAT(t.domain_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(s.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) 
+					OR NOT (t.domain_live <=> s.live) 
+					OR NOT (t.domain_postal <=> s.postal_code) 
+					OR NOT (ROUND(t.lat, 5) <=> ROUND(s.lat, 5)) 
+					OR NOT (ROUND(t.lng, 5) <=> ROUND(s.lng, 5))
 			);
-		`, "sites", "lk_domains_2"),
+		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{
 			{

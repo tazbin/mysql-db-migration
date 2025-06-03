@@ -107,28 +107,63 @@ func GetMigrationSet() sets.MigrationSet {
 				JOIN events s ON p.event_id = s.id;
 		`,
 
+		// FieldLevelValidationQuery: `
+		// 	SELECT
+		// 		events.id
+		// 	FROM
+		// 		events
+		// 		JOIN lk_module_uw_needs_2 ON lk_module_uw_needs_2.event_id = events.id
+		// 	WHERE
+		// 		events.migration_done = 1
+		// 		AND lk_module_uw_needs_2.is_migrated = 1
+		// 		AND (
+		// 			NOT (BINARY lk_module_uw_needs_2.need_address <=> BINARY events.address)
+		// 			OR NOT (BINARY lk_module_uw_needs_2.need_city <=> BINARY events.city)
+		// 			OR NOT (BINARY lk_module_uw_needs_2.need_state <=> BINARY events.` + "`state`" + `)
+		// 			OR NOT (BINARY lk_module_uw_needs_2.need_postal <=> BINARY events.postal_code)
+		// 			OR NOT (BINARY lk_module_uw_needs_2.need_country <=> BINARY events.country)
+		// 			OR NOT (BINARY lk_module_uw_needs_2.need_title <=> BINARY events.` + "`name`" + `)
+		// 			OR NOT (BINARY lk_module_uw_needs_2.need_body <=> BINARY events.description)
+		// 			OR NOT (lk_module_uw_needs_2.need_public <=> events.private)
+		// 			OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(events.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
+		// 			OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(events.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
+		// 	-- 		OR NOT (lk_module_uw_needs_2.need_status <=> events.status)
+		// 		);
+		// `,
+
 		FieldLevelValidationQuery: `
-			SELECT
-				events.id
-			FROM
-				events
-				JOIN lk_module_uw_needs_2 ON lk_module_uw_needs_2.event_id = events.id
-			WHERE
-				events.migration_done = 1
-				AND lk_module_uw_needs_2.is_migrated = 1
-				AND (
-					NOT (BINARY lk_module_uw_needs_2.need_address <=> BINARY events.address)
-					OR NOT (BINARY lk_module_uw_needs_2.need_city <=> BINARY events.city)
-					OR NOT (BINARY lk_module_uw_needs_2.need_state <=> BINARY events.` + "`state`" + `)
-					OR NOT (BINARY lk_module_uw_needs_2.need_postal <=> BINARY events.postal_code)
-					OR NOT (BINARY lk_module_uw_needs_2.need_country <=> BINARY events.country)
-					OR NOT (BINARY lk_module_uw_needs_2.need_title <=> BINARY events.` + "`name`" + `)
-					OR NOT (BINARY lk_module_uw_needs_2.need_body <=> BINARY events.description)
-					OR NOT (lk_module_uw_needs_2.need_public <=> events.private)
-					OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(events.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(events.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-			-- 		OR NOT (lk_module_uw_needs_2.need_status <=> events.status)
-				);
+				SELECT
+					events.id,
+					NOT (BINARY lk_module_uw_needs_2.need_address <=> BINARY events.address) AS address_mismatch,
+					NOT (BINARY lk_module_uw_needs_2.need_city <=> BINARY events.city) AS city_mismatch,
+					NOT (BINARY lk_module_uw_needs_2.need_state <=> BINARY events.` + "`state`" + `) AS state_mismatch,
+					NOT (BINARY lk_module_uw_needs_2.need_postal <=> BINARY events.postal_code) AS postal_mismatch,
+					NOT (BINARY lk_module_uw_needs_2.need_country <=> BINARY events.country) AS country_mismatch,
+					NOT (BINARY lk_module_uw_needs_2.need_title <=> BINARY events.` + "`name`" + `) AS title_mismatch,
+					NOT (BINARY lk_module_uw_needs_2.need_body <=> BINARY events.description) AS body_mismatch,
+					NOT (lk_module_uw_needs_2.need_public <=> events.private) AS public_mismatch,
+					NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_added_ts, '%Y-%m-%d %H:%i:%s') <=> DATE_FORMAT(events.created_at, '%Y-%m-%d %H:%i:%s')) AS date_added_mismatch,
+					NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_updated_ts, '%Y-%m-%d %H:%i:%s') <=> DATE_FORMAT(events.updated_at, '%Y-%m-%d %H:%i:%s')) AS date_updated_mismatch,
+					NOT (lk_module_uw_needs_2.need_status <=> events.status) AS status_mismatch
+				FROM
+					events
+					JOIN lk_module_uw_needs_2 ON lk_module_uw_needs_2.event_id = events.id
+				WHERE
+					events.migration_done = 1
+					AND lk_module_uw_needs_2.is_migrated = 1
+					AND (
+						NOT (BINARY lk_module_uw_needs_2.need_address <=> BINARY events.address)
+						OR NOT (BINARY lk_module_uw_needs_2.need_city <=> BINARY events.city)
+						OR NOT (BINARY lk_module_uw_needs_2.need_state <=> BINARY events.` + "`state`" + `)
+						OR NOT (BINARY lk_module_uw_needs_2.need_postal <=> BINARY events.postal_code)
+						OR NOT (BINARY lk_module_uw_needs_2.need_country <=> BINARY events.country)
+						OR NOT (BINARY lk_module_uw_needs_2.need_title <=> BINARY events.` + "`name`" + `)
+						OR NOT (BINARY lk_module_uw_needs_2.need_body <=> BINARY events.description)
+						OR NOT (lk_module_uw_needs_2.need_public <=> events.private)
+						OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_added_ts, '%Y-%m-%d %H:%i:%s') <=> DATE_FORMAT(events.created_at, '%Y-%m-%d %H:%i:%s'))
+						OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_updated_ts, '%Y-%m-%d %H:%i:%s') <=> DATE_FORMAT(events.updated_at, '%Y-%m-%d %H:%i:%s'))
+						OR NOT (lk_module_uw_needs_2.need_status <=> events.status) -- enum
+					);
 		`,
 
 		/*

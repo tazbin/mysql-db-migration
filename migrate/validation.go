@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func ValidateMigratedData(db *sql.DB, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery, fieldLevelValidationQuery, setName string) error {
@@ -71,28 +72,60 @@ func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery, setName stri
 	}
 	defer rows.Close()
 
-	var mismatchedIDs []string
-	for rows.Next() {
-		var id string
-		if err := rows.Scan(&id); err != nil {
-			return fmt.Errorf("failed to scan mismatch row: %w", err)
-		}
-		mismatchedIDs = append(mismatchedIDs, id)
+	columns, err := rows.Columns()
+	if err != nil {
+		return fmt.Errorf("failed to get column names: %w", err)
 	}
 
-	if len(mismatchedIDs) > 0 {
-		logFile := fmt.Sprintf("mismatches/%s_mismatches.log", setName)
-		file, err := os.Create(logFile) // Overwrites if exists
-		if err != nil {
-			return fmt.Errorf("failed to create mismatch log file: %w", err)
-		}
-		defer file.Close()
+	logFile := fmt.Sprintf("mismatches/%s_mismatches.log", setName)
+	file, err := os.Create(logFile)
+	if err != nil {
+		return fmt.Errorf("failed to create log file: %w", err)
+	}
+	defer file.Close()
 
-		for _, id := range mismatchedIDs {
-			_, _ = file.WriteString(fmt.Sprintf("%s,\n", id))
+	// Write header
+	header := strings.Join(columns, " | ")
+	_, _ = file.WriteString(header + "\n")
+
+	// Separator line
+	var sepParts []string
+	for _, col := range columns {
+		sepParts = append(sepParts, strings.Repeat("-", len(col)))
+	}
+	_, _ = file.WriteString(strings.Join(sepParts, "-+-") + "\n")
+
+	var mismatchCount int
+
+	for rows.Next() {
+		values := make([]interface{}, len(columns))
+		valuePtrs := make([]interface{}, len(columns))
+		for i := range values {
+			valuePtrs[i] = &values[i]
 		}
 
-		fmt.Printf("❌ Field mismatch in %d rows. IDs written to '%s'\n", len(mismatchedIDs), logFile)
+		if err := rows.Scan(valuePtrs...); err != nil {
+			return fmt.Errorf("failed to scan row: %w", err)
+		}
+
+		var rowStrings []string
+		for _, val := range values {
+			switch v := val.(type) {
+			case []byte:
+				rowStrings = append(rowStrings, fmt.Sprintf("%-10s", string(v)))
+			case nil:
+				rowStrings = append(rowStrings, "NULL")
+			default:
+				rowStrings = append(rowStrings, fmt.Sprintf("%-10v", v))
+			}
+		}
+
+		_, _ = file.WriteString(strings.Join(rowStrings, " | ") + "\n")
+		mismatchCount++
+	}
+
+	if mismatchCount > 0 {
+		fmt.Printf("❌ Field mismatch in %d rows. Details written to '%s'\n", mismatchCount, logFile)
 		return fmt.Errorf("field-level mismatch detected")
 	}
 

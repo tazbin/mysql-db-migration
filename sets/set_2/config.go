@@ -84,7 +84,10 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				site_settings.id
+				site_settings.id,
+				NOT(lk_domains_settings_2.domain_id <=> mapping_lk_domains_sites.domain_id) AS domain_id_mismatch,
+				NOT(BINARY lk_domains_settings_2.k <=> BINARY site_settings.key) AS k_mismatch,
+				NOT(BINARY lk_domains_settings_2.v <=> BINARY site_settings.value) AS v_mismatch
 			FROM
 				site_settings
 				JOIN lk_domains_settings_2 ON site_settings.id = lk_domains_settings_2.site_settings_id

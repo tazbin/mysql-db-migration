@@ -97,7 +97,9 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				time_entries.id
+				time_entries.id,
+				NOT(DATE_FORMAT(lk_module_uw_timetrack_2.hour_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(time_entries.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS hour_date_added_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_timetrack_2.hour_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(time_entries.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS hour_date_updated_mismatch
 			FROM
 				time_entries
 				JOIN lk_module_uw_timetrack_2 ON lk_module_uw_timetrack_2.time_entries_id = time_entries.id

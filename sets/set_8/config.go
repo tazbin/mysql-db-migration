@@ -97,7 +97,13 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				registrations.id
+				registrations.id,
+				NOT(lk_module_uw_needs_responses_2.response_domain_id <=> mapping_lk_domains_sites.domain_id) AS domain_id_mismatch,
+				NOT(lk_module_uw_needs_responses_2.response_sch_id <=> mapping_lk_module_uw_needs_schedule_shift.needs_schedule_id) AS sch_id_mismatch,
+				NOT(lk_module_uw_needs_responses_2.response_user_id <=> mapping_lk_users_members.user_id) user_id_mismatch,
+				NOT(lk_module_uw_needs_responses_2.response_ug_id <=> mapping_lk_user_groups_groups.user_group_id) as ug_id_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_responses_2.response_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(registrations.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_added_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_responses_2.response_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(registrations.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_updated_mismatch
 			FROM
 				registrations
 				JOIN lk_module_uw_needs_responses_2 ON lk_module_uw_needs_responses_2.registration_id = registrations.id

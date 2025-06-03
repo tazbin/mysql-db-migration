@@ -210,3 +210,167 @@
 2025/06/02 19:50:19            ⏳ Starting migration for set_10...     
 2025/06/02 19:50:19 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/06/02 19:50:27 ✅ Migration successful!
+2025/06/03 07:31:08 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 07:31:11 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 07:31:11            ⚠️  Starting rollback for set_6...        
+2025/06/03 07:31:11 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 07:31:14 
+✅ Undo migration completed successfully!
+2025/06/03 07:31:25 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 07:31:27 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 07:31:27            ⏳ Starting migration for set_6...     
+2025/06/03 07:31:27 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 07:31:37 ❌ Migration validation failed: field-level mismatch detected
+2025/06/03 08:34:37 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:34:40 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:34:40            ⚠️  Starting rollback for set_1...        
+2025/06/03 08:34:40 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:34:42 
+✅ Undo migration completed successfully!
+2025/06/03 08:34:59 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:35:01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:35:01            ⏳ Starting migration for set_1...     
+2025/06/03 08:35:01 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:35:11 ❌ Migration validation failed: field-level validation failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AS lng_mismatch
+			FROM 
+				sites s
+			JOIN 
+				lk_domains_2 t ON s.id = t.sit' at line 12
+2025/06/03 08:39:35 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:39:38 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:39:38            ⚠️  Starting rollback for set_1...        
+2025/06/03 08:39:38 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:39:40 
+✅ Undo migration completed successfully!
+2025/06/03 08:39:49 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:39:50 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:39:50            ⏳ Starting migration for set_1...     
+2025/06/03 08:39:50 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:39:58 ✅ Migration successful!
+2025/06/03 08:40:22 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:40:25 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:40:25            ⚠️  Starting rollback for set_2...        
+2025/06/03 08:40:25 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:40:26 
+✅ Undo migration completed successfully!
+2025/06/03 08:40:34 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:40:36 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:40:36            ⏳ Starting migration for set_2...     
+2025/06/03 08:40:36 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:40:43 ✅ Migration successful!
+2025/06/03 08:40:55 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:40:59 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:40:59            ⚠️  Starting rollback for set_3...        
+2025/06/03 08:40:59 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:41:07 
+✅ Undo migration completed successfully!
+2025/06/03 08:41:16 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:41:18 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:41:18            ⏳ Starting migration for set_3...     
+2025/06/03 08:41:18 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:41:29 ❌ Migration validation failed: field-level validation failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'mismatch,
+				NOT(BINARY lk_users_2.user_phone_cell <=> BINARY members.mobile_ph' at line 7
+2025/06/03 08:43:27 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:43:30 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:43:30            ⚠️  Starting rollback for set_3...        
+2025/06/03 08:43:30 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:43:35 
+✅ Undo migration completed successfully!
+2025/06/03 08:43:43 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:43:45 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:43:45            ⏳ Starting migration for set_3...     
+2025/06/03 08:43:45 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:44:01 ❌ Migration validation failed: field-level mismatch detected
+2025/06/03 08:45:51 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:45:58 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:45:58            ⚠️  Starting rollback for set_4...        
+2025/06/03 08:45:58 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:46:00 
+✅ Undo migration completed successfully!
+2025/06/03 08:46:28 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:46:29 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:46:29            ⏳ Starting migration for set_4...     
+2025/06/03 08:46:29 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:46:39 ✅ Migration successful!
+2025/06/03 08:46:47 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:50:05 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:50:07 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:50:07            ⏳ Starting migration for set_5...     
+2025/06/03 08:50:07 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:50:18 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:50:20 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:50:20            ⚠️  Starting rollback for set_5...        
+2025/06/03 08:50:20 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:50:22 
+✅ Undo migration completed successfully!
+2025/06/03 08:50:36 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:50:38 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:50:38            ⏳ Starting migration for set_5...     
+2025/06/03 08:50:38 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:50:48 ❌ Migration validation failed: field-level validation failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'NOT(lk_user_groups_users_2.ugu_leader <=> group_member.created_by_member_id) AS ' at line 6
+2025/06/03 08:51:23 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:51:25 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:51:25            ⚠️  Starting rollback for set_5...        
+2025/06/03 08:51:25 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:51:27 
+✅ Undo migration completed successfully!
+2025/06/03 08:51:33 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 08:51:35 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 08:51:35            ⏳ Starting migration for set_5...     
+2025/06/03 08:51:35 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 08:51:48 ✅ Migration successful!
+2025/06/03 09:13:00 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:13:04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:13:04            ⚠️  Starting rollback for set_6...        
+2025/06/03 09:13:04 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:13:06 
+✅ Undo migration completed successfully!
+2025/06/03 09:13:18 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:13:20 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:13:20            ⏳ Starting migration for set_6...     
+2025/06/03 09:13:20 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:13:29 ❌ Migration validation failed: field-level mismatch detected
+2025/06/03 09:13:47 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:13:51 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:13:51            ⚠️  Starting rollback for set_7...        
+2025/06/03 09:13:51 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:14:06 
+✅ Undo migration completed successfully!
+2025/06/03 09:14:16 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:14:18 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:14:18            ⏳ Starting migration for set_7...     
+2025/06/03 09:14:18 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:14:40 ✅ Migration successful!
+2025/06/03 09:14:49 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:14:54 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:14:54            ⚠️  Starting rollback for set_8...        
+2025/06/03 09:14:54 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:14:55 
+✅ Undo migration completed successfully!
+2025/06/03 09:15:04 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:15:06 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:15:06            ⏳ Starting migration for set_8...     
+2025/06/03 09:15:06 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:18:06 ✅ Migration successful!
+2025/06/03 09:20:54 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:20:57 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:20:57            ⚠️  Starting rollback for set_9...        
+2025/06/03 09:20:57 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:20:58 
+✅ Undo migration completed successfully!
+2025/06/03 09:21:11 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:21:12 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:21:12            ⏳ Starting migration for set_9...     
+2025/06/03 09:21:12 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:21:22 ✅ Migration successful!
+2025/06/03 09:21:33 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:21:37 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:21:37            ⚠️  Starting rollback for set_10...        
+2025/06/03 09:21:37 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:21:38 
+✅ Undo migration completed successfully!
+2025/06/03 09:21:47 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 09:21:48 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 09:21:48            ⏳ Starting migration for set_10...     
+2025/06/03 09:21:48 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 09:21:57 ❌ Migration validation failed: field-level mismatch detected

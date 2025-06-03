@@ -85,16 +85,20 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				email_suppressions.id
+				email_suppressions.id,
+				NOT (BINARY suppressions_2.email <=> BINARY email_suppressions.email) AS email_mismatch,
+				NOT (BINARY suppressions_2.` + "`type`" + ` <=> BINARY email_suppressions.` + "`type`" + `) as type_mismatch,
+				NOT (BINARY suppressions_2.note <=> BINARY email_suppressions.message) as note_mismatch,	
+				NOT(DATE_FORMAT(suppressions_2.date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(email_suppressions.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) as date_added_mismatch
 			FROM
 				email_suppressions
 				JOIN suppressions_2 ON suppressions_2.email_suppression_id = email_suppressions.id			
 				WHERE
 				email_suppressions.migration_done = 1
 				AND suppressions_2.is_migrated = 1
-				AND(	
+				AND(
 				NOT (BINARY suppressions_2.email <=> BINARY email_suppressions.email) 
-			--	OR	NOT (BINARY suppressions_2.` + "`type`" + ` <=> BINARY email_suppressions.` + "`type`" + `) 			
+				OR	NOT (BINARY suppressions_2.` + "`type`" + ` <=> BINARY email_suppressions.` + "`type`" + `) -- enum	
 				OR	NOT (BINARY suppressions_2.note <=> BINARY email_suppressions.message) 			
 				OR NOT(DATE_FORMAT(suppressions_2.date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(email_suppressions.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 			);

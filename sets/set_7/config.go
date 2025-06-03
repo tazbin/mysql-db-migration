@@ -103,7 +103,16 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				shifts.id
+				shifts.id,
+				NOT(lk_module_uw_needs_schedule_2.sch_domain_id <=> mapping_lk_domains_sites.domain_id) AS domain_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_need_id <=> mapping_lk_module_uw_needs_event.need_id) AS need_id_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_slots <=> shifts.capacity) AS slots_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_start_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS time_start_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_end_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS time_end_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_added_mismatch,
+				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_updated_mismatch
 			FROM
 				shifts
 				JOIN lk_module_uw_needs_schedule_2 ON lk_module_uw_needs_schedule_2.shift_id = shifts.id
@@ -115,7 +124,6 @@ func GetMigrationSet() sets.MigrationSet {
 				AND(NOT(lk_module_uw_needs_schedule_2.sch_domain_id <=> mapping_lk_domains_sites.domain_id)
 					OR NOT(lk_module_uw_needs_schedule_2.sch_need_id <=> mapping_lk_module_uw_needs_event.need_id)
 					OR NOT(lk_module_uw_needs_schedule_2.sch_slots <=> shifts.capacity)
-					
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s'))

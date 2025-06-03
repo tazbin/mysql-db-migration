@@ -87,7 +87,11 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				` + "`groups`" + `.id
+				` + "`groups`" + `.id,
+				NOT(BINARY lk_user_groups_2.ug_title <=> BINARY ` + "`groups`" + `.name) AS title_mismatch,
+				NOT(lk_user_groups_2.ug_domain_id <=> mapping_lk_domains_sites.domain_id) AS domain_mismatch,
+				NOT(DATE_FORMAT(lk_user_groups_2.ug_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(` + "`groups`" + `.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS ug_date_added_mismatch,
+				NOT(DATE_FORMAT(lk_user_groups_2.ug_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(` + "`groups`" + `.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS ug_date_updated_mismatch
 			FROM
 				` + "`groups`" + `
 				JOIN lk_user_groups_2 ON lk_user_groups_2.group_id = ` + "`groups`" + `.id

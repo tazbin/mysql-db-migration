@@ -96,7 +96,13 @@ func GetMigrationSet() sets.MigrationSet {
 
 		FieldLevelValidationQuery: `
 			SELECT
-				group_member.id
+				group_member.id,
+				NOT(lk_user_groups_users_2.ugu_domain_id <=> mapping_lk_domains_sites.domain_id) AS domain_id_mismatch,
+				NOT(lk_user_groups_users_2.ugu_user_id <=> mapping_lk_users_members.user_id) AS user_id_mismatch,
+				NOT(lk_user_groups_users_2.ugu_ug_id <=> mapping_lk_user_groups_groups.user_group_id) AS ug_id_mismatch,
+				NOT(lk_user_groups_users_2.ugu_leader <=> group_member.created_by_member_id) AS leader_mismatch,
+				NOT(DATE_FORMAT(lk_user_groups_users_2.ugu_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(group_member.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_added_mismatch,
+				NOT(DATE_FORMAT(lk_user_groups_users_2.ugu_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(group_member.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_updated_mismatch
 			FROM
 				group_member
 				JOIN mapping_lk_domains_sites ON mapping_lk_domains_sites.site_id = group_member.site_id
