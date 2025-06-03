@@ -24,10 +24,13 @@ func GetMigrationSet() sets.MigrationSet {
 		},
 
 		UpdateColumnsForTargetTable: map[string]string{
-			"user_domain":     "BIGINT UNSIGNED",
-			"user_fname":      "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-			"user_lname":      "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-			"user_email":      "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+			"user_domain": "BIGINT UNSIGNED",
+			// "user_fname":      "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+			// "user_lname":      "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+			// "user_email":      "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+			"user_fname":      "VARCHAR(255)",
+			"user_lname":      "VARCHAR(255)",
+			"user_email":      "VARCHAR(255)",
 			"user_phone_cell": "VARCHAR(255)",
 		},
 
@@ -122,8 +125,7 @@ func GetMigrationSet() sets.MigrationSet {
 					OR NOT(BINARY lk_users_2.user_email <=> BINARY members.email)
 					OR NOT(BINARY lk_users_2.user_phone_cell <=> BINARY members.mobile_phone)
 					OR NOT(DATE_FORMAT(lk_users_2.user_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_joined_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT(DATE_FORMAT(lk_users_2.user_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')))
-			LIMIT 50;
+					OR NOT(DATE_FORMAT(lk_users_2.user_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(members.user_updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')));
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

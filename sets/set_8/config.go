@@ -114,8 +114,7 @@ func GetMigrationSet() sets.MigrationSet {
 					OR NOT(lk_module_uw_needs_responses_2.response_ug_id <=> mapping_lk_user_groups_groups.user_group_id)
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_responses_2.response_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(registrations.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_responses_2.response_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(registrations.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-			)
-			LIMIT 3;
+			);
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

@@ -43,8 +43,8 @@ func GetMigrationSet() sets.MigrationSet {
 				ugu_user_id,
 				ugu_ug_id,
 				ugu_leader,
-				ugu_date_added,
-				ugu_date_updated,
+				ugu_date_added_ts,
+				ugu_date_updated_ts,
 				is_migrated
 				)
 			SELECT
@@ -111,8 +111,7 @@ func GetMigrationSet() sets.MigrationSet {
 					OR NOT(lk_user_groups_users_2.ugu_ug_id <=> mapping_lk_user_groups_groups.user_group_id)
 					OR NOT(lk_user_groups_users_2.ugu_leader <=> group_member.created_by_member_id)
 					OR NOT(DATE_FORMAT(lk_user_groups_users_2.ugu_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(group_member.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT(DATE_FORMAT(lk_user_groups_users_2.ugu_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(group_member.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')))
-			LIMIT 3;
+					OR NOT(DATE_FORMAT(lk_user_groups_users_2.ugu_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(group_member.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')));
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

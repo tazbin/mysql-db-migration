@@ -97,8 +97,7 @@ func GetMigrationSet() sets.MigrationSet {
 			--	OR	NOT (BINARY suppressions_2.` + "`type`" + ` <=> BINARY email_suppressions.` + "`type`" + `) 			
 				OR	NOT (BINARY suppressions_2.note <=> BINARY email_suppressions.message) 			
 				OR NOT(DATE_FORMAT(suppressions_2.date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(email_suppressions.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-			)
-			LIMIT 3;
+			);
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

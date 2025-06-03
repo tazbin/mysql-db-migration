@@ -29,7 +29,8 @@ func GetMigrationSet() sets.MigrationSet {
 			"need_state":     "VARCHAR(255)",
 			"need_postal":    "VARCHAR(255)",
 			"need_country":   "VARCHAR(255)",
-			"need_body":      "TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+			// "need_body":      "TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+			"need_body": "TEXT",
 		},
 		/* target table modification ends */
 
@@ -127,8 +128,7 @@ func GetMigrationSet() sets.MigrationSet {
 					OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(events.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT (DATE_FORMAT(lk_module_uw_needs_2.need_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(events.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 			-- 		OR NOT (lk_module_uw_needs_2.need_status <=> events.status)
-				)
-			LIMIT 3;
+				);
 		`,
 
 		/*

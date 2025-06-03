@@ -1,0 +1,61 @@
+// set 6 validation query
+SELECT
+	address,
+	city,
+	`state`,
+	postal_code,
+	country,
+	`name`,
+	description,
+	private,
+	created_at,
+	updated_at,
+	status
+FROM
+	events
+WHERE
+	id in();
+
+SELECT
+	need_address,
+	need_city,
+	need_state,
+	need_postal,
+	need_country,
+	need_title,
+	need_body,
+	need_public,
+	need_date_added_ts,
+	need_date_updated_ts,
+	need_status
+FROM
+	lk_module_uw_needs_2
+WHERE
+	event_id in();
+
+// set 6 validation query
+SELECT
+	first_name,
+	status,
+	last_name,
+	email,
+	mobile_phone,
+	user_joined_at,
+	user_updated_at
+FROM
+	members
+WHERE
+	id in();
+
+SELECT
+	user_fname,
+	user_status,
+	user_lname,
+	user_email,
+	user_phone_cell,
+	user_date_added_ts,
+	user_date_updated_ts
+FROM
+	lk_users_2
+WHERE
+	member_id in();

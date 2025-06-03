@@ -122,8 +122,7 @@ func GetMigrationSet() sets.MigrationSet {
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-			)
-			LIMIT 3;
+			);
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

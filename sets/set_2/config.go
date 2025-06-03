@@ -96,8 +96,7 @@ func GetMigrationSet() sets.MigrationSet {
 					NOT(lk_domains_settings_2.domain_id <=> mapping_lk_domains_sites.domain_id)
 					OR NOT(BINARY lk_domains_settings_2.k <=> BINARY site_settings.key)
 					OR NOT(BINARY lk_domains_settings_2.v <=> BINARY site_settings.value)
-					)
-			LIMIT 3;
+					);
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

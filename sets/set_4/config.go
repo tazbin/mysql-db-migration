@@ -98,8 +98,7 @@ func GetMigrationSet() sets.MigrationSet {
 				AND(NOT(BINARY lk_user_groups_2.ug_title <=> BINARY ` + "`groups`" + `.name)
 					OR NOT(lk_user_groups_2.ug_domain_id <=> mapping_lk_domains_sites.domain_id)
 					OR NOT(DATE_FORMAT(lk_user_groups_2.ug_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(` + "`groups`" + `.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT(DATE_FORMAT(lk_user_groups_2.ug_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(` + "`groups`" + `.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')))
-			LIMIT 3;
+					OR NOT(DATE_FORMAT(lk_user_groups_2.ug_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(` + "`groups`" + `.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')));
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

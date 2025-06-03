@@ -3,15 +3,16 @@ package migrate
 import (
 	"database/sql"
 	"fmt"
+	"os"
 )
 
-func ValidateMigratedData(db *sql.DB, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery, fieldLevelValidationQuery string) error {
+func ValidateMigratedData(db *sql.DB, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery, fieldLevelValidationQuery, setName string) error {
 	err := validateMigrationRowCount(db, sourceTable, targetTable, pivotTable, PivotTableMappingValidationQuery)
 	if err != nil {
 		return err
 	}
 
-	err = checkFieldLevelEquality(db, fieldLevelValidationQuery)
+	err = checkFieldLevelEquality(db, fieldLevelValidationQuery, setName)
 	if err != nil {
 		return err
 	}
@@ -63,7 +64,7 @@ func validateMigrationRowCount(db *sql.DB, sourceTable, targetTable, pivotTable,
 	return nil
 }
 
-func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery string) error {
+func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery, setName string) error {
 	rows, err := db.Query(fieldLevelValidationQuery)
 	if err != nil {
 		return fmt.Errorf("field-level validation failed: %w", err)
@@ -80,7 +81,18 @@ func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery string) error
 	}
 
 	if len(mismatchedIDs) > 0 {
-		fmt.Printf("❌ Field mismatch in %d rows. Example mismatched IDs: %v\n", len(mismatchedIDs), mismatchedIDs)
+		logFile := fmt.Sprintf("mismatches/%s_mismatches.log", setName)
+		file, err := os.Create(logFile) // Overwrites if exists
+		if err != nil {
+			return fmt.Errorf("failed to create mismatch log file: %w", err)
+		}
+		defer file.Close()
+
+		for _, id := range mismatchedIDs {
+			_, _ = file.WriteString(fmt.Sprintf("%s,\n", id))
+		}
+
+		fmt.Printf("❌ Field mismatch in %d rows. IDs written to '%s'\n", len(mismatchedIDs), logFile)
 		return fmt.Errorf("field-level mismatch detected")
 	}
 

@@ -111,8 +111,7 @@ func GetMigrationSet() sets.MigrationSet {
 				AND(
 					NOT(DATE_FORMAT(lk_module_uw_timetrack_2.hour_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(time_entries.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_timetrack_2.hour_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(time_entries.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-			)
-			LIMIT 3;
+			);
 		`,
 
 		RollbackSteps: []sets.SingleRollbackStep{

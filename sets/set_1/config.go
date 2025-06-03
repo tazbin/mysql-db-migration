@@ -102,8 +102,7 @@ func GetMigrationSet() sets.MigrationSet {
 				NOT (t.domain_postal <=> s.postal_code) OR
 				NOT (ROUND(t.lat, 5) <=> ROUND(s.lat, 5)) OR
 				NOT (ROUND(t.lng, 5) <=> ROUND(s.lng, 5))
-			)
-			LIMIT 3;
+			);
 		`, "sites", "lk_domains_2"),
 
 		RollbackSteps: []sets.SingleRollbackStep{

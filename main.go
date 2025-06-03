@@ -141,7 +141,7 @@ func main() {
 			log.Fatalf("❌ Failed to commit transaction: %v", err)
 		}
 
-		err = migrate.ValidateMigratedData(db.DB, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.PivotTableMappingValidationQuery, migrationSet.FieldLevelValidationQuery)
+		err = migrate.ValidateMigratedData(db.DB, migrationSet.SourceTableName, migrationSet.TargetTableName, migrationSet.PivotTableName, migrationSet.PivotTableMappingValidationQuery, migrationSet.FieldLevelValidationQuery, setName)
 		if err != nil {
 			tx.Rollback()
 			log.Fatalf("❌ Migration validation failed: %v", err)
