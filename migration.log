@@ -396,3 +396,30 @@
 2025/06/03 09:26:16            ⏳ Starting migration for set_10...     
 2025/06/03 09:26:16 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2025/06/03 09:26:25 ❌ Migration validation failed: field-level mismatch detected
+2025/06/03 11:17:54 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 11:17:57 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 11:17:57            ⚠️  Starting rollback for set_7...        
+2025/06/03 11:17:57 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 11:18:57 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 11:18:58 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 11:18:58            ⏳ Starting migration for set_7...     
+2025/06/03 11:18:58 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 11:19:08 ❌ Migration failed: failed to insert into target table: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.starts_at,
+				TIME(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka')) AS shift' at line 19
+2025/06/03 11:21:17 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 11:21:18 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 11:21:18            ⏳ Starting migration for set_7...     
+2025/06/03 11:21:18 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 11:21:40 ❌ Migration validation failed: field-level validation failed: Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AS date_start_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_time_start_ts ' at line 6
+2025/06/03 11:24:58 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 11:25:00 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 11:25:00            ⚠️  Starting rollback for set_7...        
+2025/06/03 11:25:00 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 11:25:11 
+✅ Undo migration completed successfully!
+2025/06/03 11:25:17 ✅ Connected to MySQL through SSH tunnel!
+2025/06/03 11:25:19 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2025/06/03 11:25:19            ⏳ Starting migration for set_7...     
+2025/06/03 11:25:19 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025/06/03 11:25:41 ✅ Migration successful!

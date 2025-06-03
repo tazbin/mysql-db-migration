@@ -18,10 +18,10 @@ func GetMigrationSet() sets.MigrationSet {
 		/* target table modification starts */
 		NewColumnsForTargetTable: map[string]string{
 			"shift_id":            "BIGINT UNSIGNED",
-			"sch_date_start_ts":   "TIMESTAMP",
-			"sch_time_start_ts":   "TIMESTAMP",
-			"sch_date_end_ts":     "TIMESTAMP",
-			"sch_time_end_ts":     "TIMESTAMP",
+			"sch_date_start_ts":   "DATE",
+			"sch_time_start_ts":   "TIME",
+			"sch_date_end_ts":     "DATE",
+			"sch_time_end_ts":     "TIME",
 			"sch_date_added_ts":   "TIMESTAMP",
 			"sch_date_updated_ts": "TIMESTAMP",
 			"is_migrated":         "TINYINT(1) DEFAULT 0",
@@ -57,10 +57,10 @@ func GetMigrationSet() sets.MigrationSet {
 				mapping_lk_domains_sites.domain_id,
 				mapping_lk_module_uw_needs_event.need_id,
 				shifts.capacity,
-				shifts.starts_at,
-				shifts.starts_at,
-				shifts.ends_at,
-				shifts.ends_at,
+				DATE(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka')) AS starts_date_at,
+				TIME(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka')) AS starts_time_at,
+				DATE(CONVERT_TZ(shifts.ends_at, 'UTC', 'Asia/Dhaka')) AS ends_date_at,
+				TIME(CONVERT_TZ(shifts.ends_at, 'UTC', 'Asia/Dhaka')) AS ends_time_at,
 				shifts.created_at,
 				shifts.updated_at,
 				1
@@ -107,10 +107,10 @@ func GetMigrationSet() sets.MigrationSet {
 				NOT(lk_module_uw_needs_schedule_2.sch_domain_id <=> mapping_lk_domains_sites.domain_id) AS domain_mismatch,
 				NOT(lk_module_uw_needs_schedule_2.sch_need_id <=> mapping_lk_module_uw_needs_event.need_id) AS need_id_mismatch,
 				NOT(lk_module_uw_needs_schedule_2.sch_slots <=> shifts.capacity) AS slots_mismatch,
-				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_start_mismatch,
-				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS time_start_mismatch,
-				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_end_mismatch,
-				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS time_end_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_date_start_ts <=> DATE(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka'))) AS date_start_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_time_start_ts <=> TIME(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka'))) AS time_start_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_date_end_ts <=> DATE(CONVERT_TZ(shifts.ends_at, 'UTC', 'Asia/Dhaka'))) AS date_end_mismatch,
+				NOT(lk_module_uw_needs_schedule_2.sch_time_end_ts <=> TIME(CONVERT_TZ(shifts.ends_at, 'UTC', 'Asia/Dhaka'))) AS time_end_mismatch,
 				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.created_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_added_mismatch,
 				NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s')) AS date_updated_mismatch
 			FROM
@@ -124,10 +124,13 @@ func GetMigrationSet() sets.MigrationSet {
 				AND(NOT(lk_module_uw_needs_schedule_2.sch_domain_id <=> mapping_lk_domains_sites.domain_id)
 					OR NOT(lk_module_uw_needs_schedule_2.sch_need_id <=> mapping_lk_module_uw_needs_event.need_id)
 					OR NOT(lk_module_uw_needs_schedule_2.sch_slots <=> shifts.capacity)
-					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_start_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.starts_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
-					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_time_end_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.ends_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
+
+					OR NOT(lk_module_uw_needs_schedule_2.sch_date_start_ts <=> DATE(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka')))
+					OR NOT(lk_module_uw_needs_schedule_2.sch_time_start_ts <=> TIME(CONVERT_TZ(shifts.starts_at, 'UTC', 'Asia/Dhaka')))
+
+					OR NOT(lk_module_uw_needs_schedule_2.sch_date_end_ts <=> DATE(CONVERT_TZ(shifts.ends_at, 'UTC', 'Asia/Dhaka')))
+					OR NOT(lk_module_uw_needs_schedule_2.sch_time_end_ts <=> TIME(CONVERT_TZ(shifts.ends_at, 'UTC', 'Asia/Dhaka')))
+
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_added_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.created_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 					OR NOT(DATE_FORMAT(lk_module_uw_needs_schedule_2.sch_date_updated_ts, '%%Y-%%m-%%d %%H:%%i:%%s') <=> DATE_FORMAT(shifts.updated_at, '%%Y-%%m-%%d %%H:%%i:%%s'))
 			);
