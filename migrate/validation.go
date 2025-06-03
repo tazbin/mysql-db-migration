@@ -77,25 +77,11 @@ func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery, setName stri
 		return fmt.Errorf("failed to get column names: %w", err)
 	}
 
-	logFile := fmt.Sprintf("mismatches/%s_mismatches.log", setName)
-	file, err := os.Create(logFile)
-	if err != nil {
-		return fmt.Errorf("failed to create log file: %w", err)
-	}
-	defer file.Close()
-
-	// Write header
-	header := strings.Join(columns, " | ")
-	_, _ = file.WriteString(header + "\n")
-
-	// Separator line
-	var sepParts []string
-	for _, col := range columns {
-		sepParts = append(sepParts, strings.Repeat("-", len(col)))
-	}
-	_, _ = file.WriteString(strings.Join(sepParts, "-+-") + "\n")
-
-	var mismatchCount int
+	var (
+		file          *os.File
+		mismatchCount int
+		logFile       = fmt.Sprintf("mismatches/%s_mismatches.log", setName)
+	)
 
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
@@ -106,6 +92,30 @@ func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery, setName stri
 
 		if err := rows.Scan(valuePtrs...); err != nil {
 			return fmt.Errorf("failed to scan row: %w", err)
+		}
+
+		// Lazy create the file if mismatch found
+		if mismatchCount == 0 {
+			// Create log file only on first mismatch
+			if err := os.MkdirAll("mismatches", os.ModePerm); err != nil {
+				return fmt.Errorf("failed to create mismatches directory: %w", err)
+			}
+
+			file, err = os.Create(logFile)
+			if err != nil {
+				return fmt.Errorf("failed to create log file: %w", err)
+			}
+
+			// Write header
+			header := strings.Join(columns, " | ")
+			_, _ = file.WriteString(header + "\n")
+
+			// Separator line
+			var sepParts []string
+			for _, col := range columns {
+				sepParts = append(sepParts, strings.Repeat("-", len(col)))
+			}
+			_, _ = file.WriteString(strings.Join(sepParts, "-+-") + "\n")
 		}
 
 		var rowStrings []string
@@ -122,6 +132,10 @@ func checkFieldLevelEquality(db *sql.DB, fieldLevelValidationQuery, setName stri
 
 		_, _ = file.WriteString(strings.Join(rowStrings, " | ") + "\n")
 		mismatchCount++
+	}
+
+	if file != nil {
+		defer file.Close()
 	}
 
 	if mismatchCount > 0 {
